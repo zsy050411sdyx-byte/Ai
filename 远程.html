@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Posture Guard · 体态守护 · 자세 지킴이</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light;
+--bg:#f4f7fb;--card:#fff;--tx:#17243a;--mu:#64758f;--ac:#2563eb;--ac2:#e8effd;--bd:#dbe3ef;--warn:#c2410c;--ok:#15803d}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f1521;--card:#171f2e;--tx:#e6edf8;--mu:#8fa0ba;--ac:#6ea0ff;--ac2:#1b2a47;--bd:#26324a;--warn:#fb923c;--ok:#4ade80}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0f1521;--card:#171f2e;--tx:#e6edf8;--mu:#8fa0ba;--ac:#6ea0ff;--ac2:#1b2a47;--bd:#26324a;--warn:#fb923c;--ok:#4ade80}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.6 -apple-system,"PingFang SC","Microsoft YaHei","Malgun Gothic",sans-serif}
+main{max-width:1000px;margin:0 auto;padding:16px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+h1{font-size:20px;margin:4px 0 2px}.sub{color:var(--mu);font-size:13px;margin:0 0 12px;max-width:640px}
+.lang{display:flex;gap:4px}.lang button{padding:5px 11px;font-size:13px}
+.grid{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:820px){.grid{grid-template-columns:1.15fr 1fr}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px}
+.cam{position:relative;aspect-ratio:4/3;background:#000;border-radius:12px;overflow:hidden}
+.cam .m{position:absolute;inset:0;transform:scaleX(-1)}
+video,canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;padding:20px;background:rgba(0,0,0,.55);font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:8px 14px;cursor:pointer}
+button.p{background:var(--ac);border-color:var(--ac);color:#fff}
+button.on{background:var(--ac2);border-color:var(--ac);color:var(--ac)}
+button:disabled{opacity:.55;cursor:default}
+.tip{font-size:13px;color:var(--mu)}.warn{color:var(--warn)}
+.tc{padding:8px 0;border-bottom:1px dashed var(--bd)}
+.tc .h{display:flex;justify-content:space-between;font-size:14px}
+.chip{font-size:12px;padding:1px 8px;border-radius:9px;background:var(--ac2);color:var(--ok)}
+.chip.bad{color:var(--warn);background:rgba(251,146,60,.15)}
+.bar{height:8px;background:var(--ac2);border-radius:5px;overflow:hidden;margin:5px 0 2px}
+.bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .15s}
+.k{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px dashed var(--bd);font-size:14px}
+.k b{font-variant-numeric:tabular-nums}
+h2{font-size:15px;margin:12px 0 6px}
+.big{font-size:36px;font-weight:700;color:var(--ac);line-height:1.1}
+.note{margin-top:12px;font-size:12px;color:var(--mu)}
+#modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5);z-index:9;padding:20px}
+#modal .b{background:var(--card);border:2px solid var(--warn);border-radius:16px;padding:20px;max-width:360px;text-align:center}
+#modal h3{margin:0 0 6px;color:var(--warn)}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><div><h1 data-t="title"></h1><p class="sub" data-t="sub"></p></div>
+<div class="lang"><button id="l-zh">中文</button><button id="l-en">English</button><button id="l-ko">한국어</button></div></div>
+<div class="grid">
+<section class="card">
+<div class="cam"><div class="m"><video id="v" playsinline muted></video><canvas id="c"></canvas></div><div class="ov" id="ov"></div></div>
+<div class="row">
+<button class="p" id="start" data-t="start"></button>
+<button id="cal" data-t="cal" disabled></button>
+<button id="snd"></button>
+</div>
+<p class="tip" id="msg"></p>
+</section>
+<section class="card">
+<div class="row" style="margin-top:0"><button id="tM" data-t="tabM"></button><button id="tT" data-t="tabT"></button></div>
+<div id="pM">
+<div id="cards"></div>
+<h2 data-t="mT"></h2>
+<div id="mets"></div>
+<h2 data-t="todayT"></h2>
+<div id="today"></div>
+</div>
+<div id="pT" style="display:none">
+<h2 data-t="recT"></h2><p class="tip" id="recs" style="margin:0"></p>
+<div class="row" id="exb"></div>
+<p class="tip" id="exd" style="margin:8px 0 0"></p>
+<div style="margin-top:8px"><div class="tip" data-t="repsT"></div><div class="big"><span id="reps">0</span><span style="font-size:16px;color:var(--mu)"> / 3</span></div>
+<div class="tip" data-t="ampT"></div><div class="bar"><i id="pb"></i></div>
+<div class="tip" data-t="holdT"></div><div class="bar"><i id="hb"></i></div>
+<div class="tip" id="form"></div></div>
+</div>
+</section>
+</div>
+<p class="note" data-t="note"></p>
+</main>
+<div id="modal"><div class="b"><h3 data-t="alT"></h3><p id="almsg"></p><button class="p" id="alok" data-t="alOk"></button></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/pose.js" crossorigin="anonymous"></script>
+<script>
+const $=id=>document.getElementById(id);
+const T={
+zh:{loc:'zh-CN',hl:'zh-CN',title:'体态守护 · 青少年体态代偿远程矫正',
+sub:'用摄像头实时捕捉头、颈、双肩与脊柱角度，识别写作业、上网课时的歪头、侧身、单侧耸肩等隐性代偿，及时提醒，并安排每日针对性康复训练。视频只在本机浏览器处理，不上传。',
+start:'打开摄像头',starting:'正在启动…',on:'摄像头已开启',retry:'重新打开摄像头',cal:'校准端正坐姿',snd1:'提醒音：开',snd0:'提醒音：关',tabM:'实时监测',tabT:'每日训练',
+ov:'点击「打开摄像头」，坐在书桌前，让头部和双肩完整入镜。',tip:'请先端正坐好，点「校准端正坐姿」，之后开始监测。',calNeed:'请先点「校准端正坐姿」才能开始监测。',calOk:'校准完成，正在监测。保持日常写字姿势即可。',noPose:'未检测到上半身，请让头和双肩入镜。',
+ok:'正常',bad:'偏离',share:'近 10 秒偏离占比',mT:'实时角度',m:['头部侧倾角','双肩高度差','颈部长度左右差','颈部倾斜角','脊柱倾斜角','肩宽比（转体）','头部高度比（低头）'],
+types:{tilt:'歪头写字',shrug:'单侧耸肩',lean:'侧身伏案',head:'低头过度'},
+al:{tilt:s=>'头部持续向'+s+'侧倾斜。把头摆正，让视线与书本平行。',shrug:s=>s+'侧肩膀偏高。放松肩膀，向下沉肩。',lean:()=>'身体歪向一侧或转向桌边。摆平双肩，面向桌子坐正。',head:()=>'头部过低。抬起下巴，把书本垫高或把屏幕调高。'},
+alT:'体态提醒',alOk:'我已调整',todayT:'今日统计',tA:'提醒次数',tMin:'监测时长',tR:'训练次数',min:'分钟',
+recT:'今日推荐',recNone:'今天还没有提醒记录，可先做任意动作。',recHas:l=>'根据今天的高频问题推荐：'+l,star:'★ ',
+ex:[['颈侧拉伸',s=>'缓慢把头向'+s+'侧倾斜约 15°，肩膀不要抬起，保持 5 秒。'],['对称耸肩放松',()=>'双肩同时向上耸起，左右保持一致，保持 3 秒后完全放松。'],['躯干侧屈',s=>'上身缓慢向'+s+'侧弯，头保持竖直，保持 5 秒。'],['抬头收下巴',()=>'颈部向上拉长、轻收下巴，让头顶向上，保持 5 秒。']],
+repsT:'已完成 / 目标 3 次',ampT:'动作幅度',holdT:'保持计时',formBad:{sh:'肩膀不要抬或歪，保持放松',head:'头部保持竖直，不要歪',sym:'左右要对称'},formOk:'姿势规范，继续保持',
+repMsg:n=>'完成第 '+n+' 次，放松后继续。',done:'本动作 3 次完成，已记录。',sw:{L:'左',R:'右'},
+perm:'摄像头权限被拒绝，请在浏览器地址栏允许摄像头后重试。',fail:m=>'启动失败：'+m,noScript:'姿态识别脚本未能加载，请检查网络。',
+note:'本工具仅用于体态习惯的自我监督与康复训练辅助，不构成医学诊断；阈值为通用经验值。未成年人使用建议有监护人陪同；如持续疼痛、麻木或体态明显异常，请及时就医。画面为镜像显示，「左/右」指您自己的左右侧。'},
+en:{loc:'en-US',hl:'en',title:'Posture Guard · Remote Correction of Teen Posture Compensation',
+sub:'Tracks head, neck, shoulders and spine angles through the camera, spots hidden compensation such as head tilt, side-leaning and one-sided shrugging while doing homework or online classes, reminds you in time, and plans daily targeted exercises. Video stays in your browser and is never uploaded.',
+start:'Start camera',starting:'Starting…',on:'Camera on',retry:'Retry camera',cal:'Calibrate good posture',snd1:'Alert sound: on',snd0:'Alert sound: off',tabM:'Live monitor',tabT:'Daily training',
+ov:'Tap “Start camera”, sit at your desk, and keep your head and both shoulders in frame.',tip:'Sit up straight, tap “Calibrate good posture”, then monitoring begins.',calNeed:'Tap “Calibrate good posture” first to start monitoring.',calOk:'Calibrated. Monitoring now — just write as usual.',noPose:'Upper body not detected. Keep your head and shoulders in frame.',
+ok:'OK',bad:'Off',share:'Off-posture share, last 10 s',mT:'Live angles',m:['Head tilt angle','Shoulder height gap','Neck length L/R gap','Neck lean angle','Spine lean angle','Shoulder width ratio (turning)','Head height ratio (head-down)'],
+types:{tilt:'Head tilt',shrug:'One-sided shrug',lean:'Side-leaning',head:'Head too low'},
+al:{tilt:s=>'Your head keeps tilting to the '+s+'. Level it so your eyes are parallel to the book.',shrug:s=>'Your '+s+' shoulder is raised. Relax and drop it down.',lean:()=>'You are leaning or turning to one side. Level your shoulders and face the desk.',head:()=>'Your head is too low. Lift your chin and raise the book or screen.'},
+alT:'Posture reminder',alOk:'Fixed it',todayT:'Today',tA:'Reminders',tMin:'Monitored',tR:'Training reps',min:'min',
+recT:'Recommended today',recNone:'No reminders yet today — try any exercise.',recHas:l=>'Based on today’s most frequent issues: '+l,star:'★ ',
+ex:[['Neck side stretch',s=>'Slowly tilt your head about 15° to the '+s+', keep shoulders down, hold 5 s.'],['Symmetric shrug release',()=>'Raise both shoulders together and evenly, hold 3 s, then fully relax.'],['Trunk side bend',s=>'Bend your upper body slowly to the '+s+', head upright, hold 5 s.'],['Chin tuck & lengthen',()=>'Lengthen your neck upward with a gentle chin tuck, hold 5 s.']],
+repsT:'Done / goal 3 reps',ampT:'Movement range',holdT:'Hold timer',formBad:{sh:'Don’t hike or tilt your shoulders — stay relaxed',head:'Keep your head upright, don’t tilt it',sym:'Keep both sides even'},formOk:'Good form — keep holding',
+repMsg:n=>'Rep '+n+' done. Relax, then continue.',done:'All 3 reps done and recorded.',sw:{L:'left',R:'right'},
+perm:'Camera permission denied. Allow camera access in your browser and try again.',fail:m=>'Failed to start: '+m,noScript:'The pose script failed to load. Check your network.',
+note:'This tool is only for self-monitoring of posture habits and rehab-exercise support, not a medical diagnosis; thresholds are general rules of thumb. Minors should use it with a guardian. Seek care for persistent pain, numbness or clearly abnormal posture. The view is mirrored: “left/right” means your own left/right.'},
+ko:{loc:'ko-KR',hl:'ko',title:'자세 지킴이 · 청소년 자세 보상 행동 원격 교정',
+sub:'카메라로 머리, 목, 양 어깨, 척추 각도를 실시간으로 파악해 숙제나 온라인 수업 중의 고개 기울임, 몸 기울임, 한쪽 어깨 으쓱 같은 숨은 보상 동작을 찾아 알려 주고, 매일 맞춤 재활 운동을 안내합니다. 영상은 브라우저에서만 처리되며 업로드되지 않습니다.',
+start:'카메라 켜기',starting:'시작 중…',on:'카메라 켜짐',retry:'카메라 다시 켜기',cal:'바른 자세 보정',snd1:'알림음: 켜짐',snd0:'알림음: 꺼짐',tabM:'실시간 모니터',tabT:'오늘의 훈련',
+ov:'「카메라 켜기」를 누르고 책상 앞에 앉아 머리와 양 어깨가 화면에 모두 보이게 하세요.',tip:'바르게 앉은 뒤 「바른 자세 보정」을 누르면 모니터링이 시작됩니다.',calNeed:'먼저 「바른 자세 보정」을 눌러야 모니터링이 시작됩니다.',calOk:'보정 완료. 모니터링 중입니다. 평소처럼 글씨를 쓰세요.',noPose:'상체가 감지되지 않습니다. 머리와 어깨가 보이게 해 주세요.',
+ok:'정상',bad:'이탈',share:'최근 10초 이탈 비율',mT:'실시간 각도',m:['고개 기울기 각도','어깨 높이 차이','목 길이 좌우 차이','목 기울기 각도','척추 기울기 각도','어깨 너비 비율(몸 돌림)','머리 높이 비율(숙임)'],
+types:{tilt:'고개 기울임',shrug:'한쪽 어깨 으쓱',lean:'몸 기울여 엎드림',head:'과도한 숙임'},
+al:{tilt:s=>'고개가 계속 '+s+'으로 기울어 있습니다. 머리를 바로 세워 시선이 책과 평행하게 하세요.',shrug:s=>s+' 어깨가 올라가 있습니다. 어깨 힘을 빼고 아래로 내리세요.',lean:()=>'몸이 한쪽으로 기울거나 책상 쪽으로 돌아가 있습니다. 어깨를 수평으로 하고 책상을 정면으로 바라보세요.',head:()=>'머리가 너무 숙여져 있습니다. 턱을 당겨 올리고 책이나 화면을 높이세요.'},
+alT:'자세 알림',alOk:'바로잡았어요',todayT:'오늘 통계',tA:'알림 횟수',tMin:'모니터링 시간',tR:'훈련 횟수',min:'분',
+recT:'오늘의 추천',recNone:'오늘 알림 기록이 아직 없습니다. 원하는 동작부터 해 보세요.',recHas:l=>'오늘 자주 나온 문제 기준 추천: '+l,star:'★ ',
+ex:[['목 옆 스트레칭',s=>'머리를 '+s+' 쪽으로 천천히 약 15° 기울이고, 어깨는 올리지 말고 5초 유지하세요.'],['대칭 어깨 으쓱 이완',()=>'양 어깨를 똑같이 함께 올려 3초 유지한 뒤 완전히 힘을 빼세요.'],['몸통 옆 굽히기',s=>'머리는 똑바로 두고 상체를 '+s+' 쪽으로 천천히 굽혀 5초 유지하세요.'],['턱 당기며 목 늘리기',()=>'턱을 살짝 당기며 목을 위로 길게 늘여 5초 유지하세요.']],
+repsT:'완료 / 목표 3회',ampT:'동작 크기',holdT:'유지 시간',formBad:{sh:'어깨를 올리거나 기울이지 말고 힘을 빼세요',head:'머리를 똑바로 유지하세요',sym:'좌우를 똑같이 하세요'},formOk:'자세가 좋아요. 계속 유지하세요',
+repMsg:n=>n+'회 완료. 힘을 빼고 계속하세요.',done:'이 동작 3회를 완료하고 기록했습니다.',sw:{L:'왼쪽',R:'오른쪽'},
+perm:'카메라 권한이 거부되었습니다. 브라우저에서 카메라를 허용한 뒤 다시 시도하세요.',fail:m=>'시작 실패: '+m,noScript:'자세 인식 스크립트를 불러오지 못했습니다. 네트워크를 확인하세요.',
+note:'이 도구는 자세 습관의 자가 점검과 재활 운동 보조용이며 의학적 진단이 아닙니다. 기준값은 일반적인 경험치입니다. 미성년자는 보호자와 함께 사용하세요. 통증·저림이 계속되거나 자세가 뚜렷이 이상하면 진료를 받으세요. 화면은 거울 모드이며 「왼쪽/오른쪽」은 본인 기준입니다.'}
+};
+let L='zh';
+try{const s=localStorage.getItem('plang');if(s&&T[s])L=s;else{const n=(navigator.language||'').slice(0,2);if(T[n])L=n}}catch(e){}
+const t=()=>T[L],TY=['tilt','shrug','lean','head'],HOLD=[5,3,5,5];
+let startKey='start',msgFn=()=>t().tip,ovFn=()=>t().ov,sound=true,tab='M',base=null,run=false,M=null,R=null,last=0,exI=0,reps=0,hold=0,locked=false,formKey='';
+const ema={tilt:0,shrug:0,lean:0,head:0},lastA={},flag={},side={};
+const dayKey=()=>'pd_'+new Date().toLocaleDateString('sv');
+let rec={c:{tilt:0,shrug:0,lean:0,head:0},sd:{tilt:{L:0,R:0},shrug:{L:0,R:0}},sec:0,tr:0};
+try{const r=JSON.parse(localStorage.getItem(dayKey())||'null');if(r)rec=Object.assign(rec,r)}catch(e){}
+const saveRec=()=>{try{localStorage.setItem(dayKey(),JSON.stringify(rec))}catch(e){}};
+setInterval(saveRec,10000);
+const setMsg=f=>{msgFn=f;$('msg').textContent=f()};
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+function build(){
+ $('cards').innerHTML=TY.map(k=>'<div class="tc"><div class="h"><span id="n'+k+'"></span><span class="chip" id="c'+k+'"></span></div><div class="bar"><i id="b'+k+'"></i></div><div class="tip" id="s'+k+'"></div></div>').join('');
+ $('mets').innerHTML=[0,1,2,3,4,5,6].map(i=>'<div class="k"><span id="mn'+i+'"></span><b id="mv'+i+'">--</b></div>').join('');
+ $('exb').innerHTML=[0,1,2,3].map(i=>'<button id="ex'+i+'"></button>').join('');
+ [0,1,2,3].forEach(i=>$('ex'+i).onclick=()=>pickEx(i));
+}
+function recList(){return TY.filter(k=>rec.c[k]>0).sort((a,b)=>rec.c[b]-rec.c[a]).slice(0,2)}
+const exOf=k=>TY.indexOf(k);
+function tgtSide(){const s=rec.sd.tilt;return s.L>s.R?'R':'L'}
+function renderStatic(){
+ const T_=t();
+ document.documentElement.lang=T_.hl;
+ document.querySelectorAll('[data-t]').forEach(e=>e.textContent=T_[e.dataset.t]);
+ $('start').textContent=T_[startKey];$('msg').textContent=msgFn();$('ov').textContent=ovFn();
+ $('snd').textContent=sound?T_.snd1:T_.snd0;
+ ['zh','en','ko'].forEach(k=>$('l-'+k).className=k===L?'on':'');
+ TY.forEach(k=>$('n'+k).textContent=T_.types[k]);
+ T_.m.forEach((x,i)=>$('mn'+i).textContent=x);
+ const rl=recList(),star=ex=>rl.map(exOf).includes(ex)?T_.star:'';
+ [0,1,2,3].forEach(i=>$('ex'+i).textContent=star(i)+T_.ex[i][0]);
+ $('recs').textContent=rl.length?T_.recHas(rl.map(k=>T_.types[k]).join(' / ')):T_.recNone;
+ $('exd').textContent=T_.ex[exI][1](T_.sw[tgtSide()]);
+ renderToday();
+}
+function renderToday(){
+ const T_=t(),n=Object.values(rec.c).reduce((a,b)=>a+b,0);
+ $('today').innerHTML=[[T_.tA,n],[T_.tMin,Math.round(rec.sec/60)+' '+T_.min],[T_.tR,rec.tr]].map(x=>'<div class="k"><span>'+x[0]+'</span><b>'+x[1]+'</b></div>').join('');
+}
+function pickEx(i){exI=i;reps=0;hold=0;locked=false;$('reps').textContent=0;[0,1,2,3].forEach(j=>$('ex'+j).className=j===i?'on':'');$('exd').textContent=t().ex[i][1](t().sw[tgtSide()])}
+function setTab(x){tab=x;$('pM').style.display=x==='M'?'':'none';$('pT').style.display=x==='T'?'':'none';$('tM').className=x==='M'?'on':'';$('tT').className=x==='T'?'on':''}
+$('tM').onclick=()=>setTab('M');
+$('tT').onclick=()=>{const rl=recList();if(rl.length&&!reps)pickEx(exOf(rl[0]));setTab('T')};
+['zh','en','ko'].forEach(k=>$('l-'+k).onclick=()=>{L=k;try{localStorage.setItem('plang',k)}catch(e){}renderStatic()});
+$('snd').onclick=()=>{sound=!sound;$('snd').textContent=sound?t().snd1:t().snd0};
+function beep(){if(!sound)return;try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=660;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.25)}catch(e){}}
+let alT_;
+function alert_(k,sd){
+ $('almsg').textContent=t().al[k](sd?t().sw[sd]:'');
+ $('modal').style.display='flex';beep();clearTimeout(alT_);alT_=setTimeout(()=>$('modal').style.display='none',12000);
+}
+$('alok').onclick=()=>{$('modal').style.display='none'};
+const v=$('v'),c=$('c'),ctx=c.getContext('2d');
+function measure(lm){
+ const W=v.videoWidth,H=v.videoHeight,P=i=>({x:lm[i].x*W,y:lm[i].y*H,v:lm[i].visibility||0});
+ const n=P(0),e7=P(7),e8=P(8),s11=P(11),s12=P(12),h23=P(23),h24=P(24);
+ const sw=Math.hypot(s11.x-s12.x,s11.y-s12.y),deg=Math.PI/180;
+ const sc={x:(s11.x+s12.x)/2,y:(s11.y+s12.y)/2},ec={x:(e7.x+e8.x)/2,y:(e7.y+e8.y)/2};
+ const hip=h23.v>.5&&h24.v>.5&&h23.y>sc.y+sw*.5?{x:(h23.x+h24.x)/2,y:(h23.y+h24.y)/2}:null;
+ return {tilt:Math.atan2(e7.y-e8.y,e7.x-e8.x)/deg,sa:Math.atan2(s11.y-s12.y,s11.x-s12.x)/deg,sw,nl:(s11.y-e7.y)/sw,nr:(s12.y-e8.y)/sw,
+  drop:(sc.y-n.y)/sw,cx:sc.x,neck:Math.atan2(ec.x-sc.x,sc.y-ec.y)/deg,sp:hip?Math.atan2(sc.x-hip.x,hip.y-sc.y)/deg:null};
+}
+function rel(m){
+ return {dt:m.tilt-base.tilt,dsa:m.sa-base.sa,dsh:(m.nl-m.nr)-(base.nl-base.nr),twist:1-m.sw/base.sw,dropR:m.drop/base.drop,
+  shift:(m.cx-base.cx)/base.sw,dsp:m.sp!=null&&base.sp!=null?m.sp-base.sp:0,dneck:m.neck-base.neck,up:1-((m.nl+m.nr)/2)/((base.nl+base.nr)/2)};
+}
+function draw(lm){
+ c.width=v.videoWidth;c.height=v.videoHeight;ctx.clearRect(0,0,c.width,c.height);
+ const bad=Object.values(flag).some(Boolean);ctx.strokeStyle=bad?'#fb923c':'#34d399';ctx.fillStyle=ctx.strokeStyle;ctx.lineWidth=4;
+ const p=i=>[lm[i].x*c.width,lm[i].y*c.height];
+ [[11,12],[7,8],[7,11],[8,12]].forEach(([a,b])=>{ctx.beginPath();ctx.moveTo(...p(a));ctx.lineTo(...p(b));ctx.stroke()});
+ [0,7,8,11,12].forEach(i=>{ctx.beginPath();ctx.arc(...p(i),6,0,7);ctx.fill()});
+}
+function onRes(r){
+ const lm=r.poseLandmarks;
+ if(!lm||[0,7,8,11,12].some(i=>(lm[i].visibility||0)<.4)){ctx.clearRect(0,0,c.width,c.height);M=null;last=0;if(base)setMsg(()=>t().noPose);return}
+ const raw=measure(lm);
+ M=M?Object.fromEntries(Object.keys(raw).map(k=>[k,raw[k]==null||M[k]==null?raw[k]:M[k]*.6+raw[k]*.4])):raw;
+ const now=performance.now(),dt=last?Math.min((now-last)/1000,.5):0;last=now;
+ if(!base){draw(lm);return}
+ R=rel(M);rec.sec+=dt;
+ const f={tilt:Math.abs(R.dt)>8,shrug:Math.abs(R.dsh)>.07,lean:Math.abs(R.dsa)>6||R.twist>.12||Math.abs(R.shift)>.3||Math.abs(R.dsp)>6,head:R.dropR<.8};
+ side.tilt=R.dt>0?'L':'R';side.shrug=R.dsh<0?'L':'R';
+ TY.forEach(k=>{flag[k]=f[k];ema[k]+=((f[k]?1:0)-ema[k])*(1-Math.exp(-dt/10));
+  if(ema[k]>.6&&now-(lastA[k]||0)>60000){lastA[k]=now;ema[k]=0;rec.c[k]++;if(side[k]&&rec.sd[k])rec.sd[k][side[k]]++;saveRec();alert_(k,rec.sd[k]?side[k]:'');renderStatic()}});
+ draw(lm);ui();if(tab==='T')train(dt);
+}
+function ui(){
+ const T_=t();
+ TY.forEach(k=>{const e=$('c'+k);e.textContent=flag[k]?T_.bad:T_.ok;e.className='chip'+(flag[k]?' bad':'');
+  $('b'+k).style.width=Math.min(ema[k]/.6,1)*100+'%';$('s'+k).textContent=T_.share+' '+Math.round(ema[k]*100)+'%'});
+ const v_=[R.dt.toFixed(1)+'°',(R.dsh*100).toFixed(1)+'%',((M.nl-M.nr)*100).toFixed(1)+'%',M.neck.toFixed(1)+'°',M.sp==null?'--':M.sp.toFixed(1)+'°',(M.sw/base.sw*100).toFixed(0)+'%',(R.dropR*100).toFixed(0)+'%'];
+ v_.forEach((x,i)=>$('mv'+i).textContent=x);
+ if(msgFn()!==undefined&&$('msg').textContent===T_.noPose)setMsg(()=>T_.calOk);
+}
+function train(dt){
+ const s=tgtSide()==='L'?1:-1,sh=Math.abs(R.dsh)<.07&&Math.abs(R.dsa)<6;let p=0,form='';
+ if(exI===0){p=s*R.dt/15;form=sh?'':'sh'}
+ else if(exI===1){p=R.up/.15;form=Math.abs(R.dsh)<.07?'':'sym'}
+ else if(exI===2){p=s*R.dsa/10;form=Math.abs(R.dt)<6?'':'head'}
+ else{p=(R.dropR-.97)/.08;form=sh&&Math.abs(R.dt)<6?'':'sh'}
+ p=clamp(p,0,1.2);$('pb').style.width=Math.min(p,1)*100+'%';
+ const need=HOLD[exI],ok=!form;
+ $('form').textContent=p>.3?(ok?t().formOk:t().formBad[form]):'';$('form').className='tip'+(p>.3&&!ok?' warn':'');
+ if(p>=1&&ok&&!locked){hold+=dt;$('hb').style.width=Math.min(hold/need,1)*100+'%';
+  if(hold>=need){reps++;hold=0;locked=true;rec.tr++;saveRec();renderToday();$('reps').textContent=reps;
+   if(reps>=3){setMsg(()=>t().done);reps=0;$('reps').textContent=0}else{const n=reps;setMsg(()=>t().repMsg(n))}}}
+ else{if(p<.4)locked=false;if(!(p>=1&&ok)){hold=0;$('hb').style.width=0}}
+}
+$('cal').onclick=()=>{
+ if(!M){setMsg(()=>t().noPose);return}
+ base={tilt:M.tilt,sa:M.sa,sw:M.sw,nl:M.nl,nr:M.nr,drop:M.drop,cx:M.cx,sp:M.sp,neck:M.neck};
+ TY.forEach(k=>ema[k]=0);setMsg(()=>t().calOk);
+};
+$('start').onclick=async()=>{
+ if(run)return;
+ $('start').disabled=true;startKey='starting';$('start').textContent=t().starting;
+ try{
+  if(typeof Pose==='undefined')throw new Error(t().noScript);
+  const ps=new Pose({locateFile:f=>'https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/'+f});
+  ps.setOptions({modelComplexity:1,smoothLandmarks:true,minDetectionConfidence:.5,minTrackingConfidence:.5});
+  ps.onResults(onRes);
+  const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:960},height:{ideal:720}},audio:false});
+  v.srcObject=st;await v.play();
+  $('ov').style.display='none';run=true;$('cal').disabled=false;startKey='on';$('start').textContent=t().on;
+  let busy=false;
+  (async function loop(){if(!busy&&v.readyState>=2){busy=true;try{await ps.send({image:v})}catch(e){}busy=false}requestAnimationFrame(loop)})();
+ }catch(e){
+  $('start').disabled=false;startKey='retry';$('start').textContent=t().retry;$('ov').style.display='flex';
+  const d=e&&e.name==='NotAllowedError',em=e&&e.message?e.message:String(e);
+  ovFn=()=>d?t().perm:t().fail(em);$('ov').textContent=ovFn();
+ }
+};
+build();pickEx(0);setTab('M');renderStatic();
+</script>
+</body>
+</html>
