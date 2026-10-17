@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mouth Rehab · 嘴部康复 · 구강 재활</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light;
+--bg:#f5f7f6;--card:#fff;--tx:#1b2a26;--mu:#667a74;--ac:#0f8f78;--ac2:#e6f5f1;--bd:#dce5e2;--warn:#c2410c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#101614;--card:#18211e;--tx:#e7f0ed;--mu:#8fa59e;--ac:#34d1b4;--ac2:#18302a;--bd:#263430;--warn:#fb923c}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#101614;--card:#18211e;--tx:#e7f0ed;--mu:#8fa59e;--ac:#34d1b4;--ac2:#18302a;--bd:#263430;--warn:#fb923c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.6 -apple-system,"PingFang SC","Microsoft YaHei","Malgun Gothic",sans-serif}
+main{max-width:960px;margin:0 auto;padding:16px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+h1{font-size:20px;margin:4px 0 2px}
+.lang{display:flex;gap:4px}
+.lang button{padding:5px 11px;font-size:13px}
+.sub{color:var(--mu);font-size:13px;margin:0 0 12px}
+.grid{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:800px){.grid{grid-template-columns:1.3fr 1fr}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px}
+.cam{position:relative;aspect-ratio:4/3;background:#000;border-radius:12px;overflow:hidden}
+.cam .m{position:absolute;inset:0;transform:scaleX(-1)}
+video,canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;padding:20px;background:rgba(0,0,0,.55);font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:8px 14px;cursor:pointer}
+button.p{background:var(--ac);border-color:var(--ac);color:#fff}
+button.on{background:var(--ac2);border-color:var(--ac);color:var(--ac)}
+button:disabled{opacity:.55;cursor:default}
+.k{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed var(--bd);font-size:14px}
+.k b{font-variant-numeric:tabular-nums}
+.big{font-size:38px;font-weight:700;color:var(--ac);line-height:1.1}
+.bar{height:10px;background:var(--ac2);border-radius:6px;overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .1s}
+.tip{font-size:13px;color:var(--mu)}
+.warn{color:var(--warn)}
+.note{margin-top:12px;font-size:12px;color:var(--mu)}
+h2{font-size:15px;margin:0 0 8px}
+.hist div{font-size:13px;color:var(--mu);padding:3px 0}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><div><h1 data-t="title"></h1><p class="sub" data-t="sub"></p></div>
+<div class="lang"><button id="l-zh">中文</button><button id="l-en">English</button><button id="l-ko">한국어</button></div></div>
+<div class="grid">
+<section class="card">
+<div class="cam">
+<div class="m"><video id="v" playsinline muted></video><canvas id="c"></canvas></div>
+<div class="ov" id="ov"></div>
+</div>
+<div class="row">
+<button class="p" id="start" data-t="start"></button>
+<button id="cal" data-t="cal" disabled></button>
+<button id="save" data-t="save" disabled></button>
+</div>
+<p class="tip" id="msg"></p>
+</section>
+<section class="card">
+<h2 data-t="exT"></h2>
+<div class="row" id="ex" style="margin-top:0"></div>
+<p class="tip" id="exd" style="margin:8px 0 0"></p>
+<div style="margin-top:10px">
+<div class="tip" data-t="prog"></div>
+<div class="big"><span id="reps">0</span><span style="font-size:16px;color:var(--mu)"> / 10</span></div>
+<div class="tip" data-t="amp"></div><div class="bar"><i id="pb"></i></div>
+<div class="tip" data-t="holdT"></div><div class="bar"><i id="hb"></i></div>
+</div>
+<h2 style="margin-top:12px" data-t="symT"></h2>
+<div class="big" id="sym">--</div>
+<div class="tip" id="side"></div>
+<div style="margin-top:6px">
+<div class="k"><span data-t="m1"></span><b id="m1">--</b></div>
+<div class="k"><span data-t="m2"></span><b id="m2">--</b></div>
+<div class="k"><span data-t="m3"></span><b id="m3">--</b></div>
+<div class="k"><span data-t="m4"></span><b id="m4">--</b></div>
+<div class="k"><span data-t="avg"></span><b id="avg">--</b></div>
+</div>
+<div class="hist" style="margin-top:10px"><h2 data-t="histT"></h2><div id="hist"></div></div>
+</section>
+</div>
+<p class="note" data-t="note"></p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/face_mesh.js" crossorigin="anonymous"></script>
+<script>
+const $=id=>document.getElementById(id);
+const T={
+zh:{loc:'zh-CN',htmlLang:'zh-CN',
+title:'面瘫后遗症 · 嘴部康复训练',
+sub:'摄像头实时识别嘴部姿态，评估左右对称度，并引导做康复动作。视频仅在本机浏览器处理，不会上传。',
+start:'打开摄像头',starting:'正在启动…',on:'摄像头已开启',retry:'重新打开摄像头',cal:'记录静息基线',save:'保存本次',
+tip:'提示：先放松面部，点「记录静息基线」，再选择动作训练。',
+ov:'点击下方「打开摄像头」开始。请正对镜头，光线均匀，保持面部完整入镜。',
+exT:'训练动作',prog:'已完成 / 目标 10 次',amp:'动作幅度',holdT:'保持计时（需持续约 1 秒）',symT:'实时对称度',
+m1:'嘴角高度差',m2:'嘴部中线偏移',m3:'嘴宽（相对）',m4:'张口度（相对）',avg:'本次平均对称度',histT:'历史记录',none:'暂无记录',
+note:'本工具仅用于康复训练辅助与自我观察，不构成医学诊断。请遵医嘱或康复师指导训练；如出现疼痛、抽搐加重等不适请停止并就医。画面为镜像显示，「右侧」指您自己的右侧嘴角。',
+ex:[['微笑','嘴唇闭合，向两侧缓慢微笑，尽量让两侧嘴角同时上提。'],['大笑露齿','用力向两侧咧开嘴露出牙齿，保持左右同样用力。'],['噘嘴','像吹口哨一样向前噘起嘴唇，嘴角向中间收拢。'],['张口','缓慢张大嘴巴，下颌保持居中，不要歪向一侧。']],
+noFace:'未检测到人脸，请正对镜头',level:'嘴角基本水平对称',low:s=>'您的'+(s=='R'?'右':'左')+'侧嘴角偏低',
+rep:(n,s)=>'完成第 '+n+' 次，对称度 '+s+'%。放松后继续。',setDone:'本组 10 次完成，已自动保存。',saved:'已保存。',
+calOk:'已记录静息基线，请开始训练。',calFail:'未识别到人脸，无法记录基线。',
+perm:'摄像头权限被拒绝，请在浏览器地址栏允许摄像头后重试。',fail:m=>'启动失败：'+m,noScript:'识别模型脚本未能加载，请检查网络。',
+hist:h=>h.t+' · '+h.e+' · '+h.r+' 次 · 平均对称度 '+h.s+'%'},
+en:{loc:'en-US',htmlLang:'en',
+title:'Facial Palsy Sequelae · Mouth Rehab Training',
+sub:'Tracks your mouth posture through the camera in real time, scores left/right symmetry, and guides rehab exercises. Video is processed in your browser only and never uploaded.',
+start:'Start camera',starting:'Starting…',on:'Camera on',retry:'Retry camera',cal:'Record resting baseline',save:'Save session',
+tip:'Tip: relax your face, tap “Record resting baseline”, then pick an exercise.',
+ov:'Tap “Start camera” below. Face the camera with even lighting and keep your whole face in frame.',
+exT:'Exercises',prog:'Done / goal 10 reps',amp:'Movement range',holdT:'Hold timer (about 1 second)',symT:'Live symmetry',
+m1:'Mouth-corner height gap',m2:'Mouth midline shift',m3:'Mouth width (relative)',m4:'Mouth opening (relative)',avg:'Session average symmetry',histT:'History',none:'No records yet',
+note:'This tool is only an aid for rehab practice and self-observation, not a medical diagnosis. Follow your doctor or therapist’s guidance; stop and seek care if you feel pain or twitching worsens. The view is mirrored: “right” means your own right mouth corner.',
+ex:[['Smile','Close your lips and smile slowly, lifting both corners together.'],['Big smile (teeth)','Stretch your lips wide to show teeth, using equal effort on both sides.'],['Pucker','Purse your lips forward as if whistling, drawing the corners inward.'],['Open mouth','Open wide slowly, keeping your jaw centered and not drifting to one side.']],
+noFace:'No face detected. Please face the camera.',level:'Mouth corners are roughly level',low:s=>'Your '+(s=='R'?'right':'left')+' mouth corner is lower',
+rep:(n,s)=>'Rep '+n+' done, symmetry '+s+'%. Relax, then continue.',setDone:'Set of 10 complete — saved automatically.',saved:'Saved.',
+calOk:'Baseline recorded. You can start training.',calFail:'No face detected, cannot record baseline.',
+perm:'Camera permission denied. Allow camera access in your browser and try again.',fail:m=>'Failed to start: '+m,noScript:'The recognition model script failed to load. Check your network.',
+hist:h=>h.t+' · '+h.e+' · '+h.r+' reps · avg symmetry '+h.s+'%'},
+ko:{loc:'ko-KR',htmlLang:'ko',
+title:'안면마비 후유증 · 입 재활 훈련',
+sub:'카메라로 입 모양을 실시간 인식해 좌우 대칭도를 평가하고 재활 동작을 안내합니다. 영상은 브라우저에서만 처리되며 업로드되지 않습니다.',
+start:'카메라 켜기',starting:'시작 중…',on:'카메라 켜짐',retry:'카메라 다시 켜기',cal:'안정 시 기준값 기록',save:'이번 훈련 저장',
+tip:'안내: 얼굴 힘을 뺀 뒤 「안정 시 기준값 기록」을 누르고 동작을 선택하세요.',
+ov:'아래 「카메라 켜기」를 누르세요. 카메라를 정면으로 바라보고, 조명을 고르게 하며 얼굴 전체가 보이게 해 주세요.',
+exT:'훈련 동작',prog:'완료 / 목표 10회',amp:'동작 크기',holdT:'유지 시간 (약 1초)',symT:'실시간 대칭도',
+m1:'입꼬리 높이 차이',m2:'입 중심선 편차',m3:'입 너비(상대값)',m4:'입 벌림(상대값)',avg:'이번 평균 대칭도',histT:'기록',none:'기록 없음',
+note:'이 도구는 재활 연습과 자가 관찰을 돕기 위한 것이며 의학적 진단이 아닙니다. 의사나 재활치료사의 지도에 따라 훈련하고, 통증이나 경련이 심해지면 중단하고 진료받으세요. 화면은 거울 모드이며 「오른쪽」은 본인의 오른쪽 입꼬리입니다.',
+ex:[['미소','입술을 다문 채 천천히 웃으며 양쪽 입꼬리를 함께 올리세요.'],['크게 웃기(치아)','입을 양옆으로 크게 벌려 치아를 드러내고, 좌우 같은 힘을 주세요.'],['입 오므리기','휘파람 불듯 입술을 앞으로 내밀어 입꼬리를 가운데로 모으세요.'],['입 벌리기','턱이 한쪽으로 치우치지 않게 중앙을 유지하며 천천히 크게 벌리세요.']],
+noFace:'얼굴이 감지되지 않습니다. 카메라를 정면으로 봐 주세요.',level:'입꼬리가 대체로 수평입니다',low:s=>'본인의 '+(s=='R'?'오른쪽':'왼쪽')+' 입꼬리가 더 낮습니다',
+rep:(n,s)=>n+'회 완료, 대칭도 '+s+'%. 힘을 빼고 계속하세요.',setDone:'10회 완료 — 자동 저장되었습니다.',saved:'저장되었습니다.',
+calOk:'기준값을 기록했습니다. 훈련을 시작하세요.',calFail:'얼굴이 감지되지 않아 기준값을 기록할 수 없습니다.',
+perm:'카메라 권한이 거부되었습니다. 브라우저에서 카메라를 허용한 뒤 다시 시도하세요.',fail:m=>'시작 실패: '+m,noScript:'인식 모델 스크립트를 불러오지 못했습니다. 네트워크를 확인하세요.',
+hist:h=>h.t+' · '+h.e+' · '+h.r+'회 · 평균 대칭도 '+h.s+'%'}
+};
+let L='zh';
+try{const s=localStorage.getItem('mlang');if(s&&T[s])L=s;else{const n=(navigator.language||'').slice(0,2);if(T[n])L=n}}catch(e){}
+const t=()=>T[L];
+let startKey='start',msgFn=()=>t().tip,ovFn=()=>t().ov,sideFn=null,B={w:0.55,o:0.02},cur=0,reps=0,hold=0,locked=false,run=false,last=null,sm=null,syms=[],avgSum=0,avgN=0;
+const setMsg=f=>{msgFn=f;$('msg').textContent=f()};
+function apply(){
+ document.documentElement.lang=t().htmlLang;
+ document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t()[e.dataset.t]);
+ $('start').textContent=t()[startKey];$('msg').textContent=msgFn();$('ov').textContent=ovFn();
+ ['zh','en','ko'].forEach(k=>$('l-'+k).className=k===L?'on':'');
+ $('exd').textContent=t().ex[cur][1];
+ t().ex.forEach((e,i)=>$('ex'+i).textContent=e[0]);
+ if(sideFn)sideFn();else{$('side').textContent=t().noFace;$('side').className='tip'}
+ showHist();
+}
+['zh','en','ko'].forEach(k=>$('l-'+k).onclick=()=>{L=k;try{localStorage.setItem('mlang',k)}catch(e){}apply()});
+const EX=[
+{f:m=>(m.w/B.w-1)/0.15},{f:m=>(m.w/B.w-1)/0.3},{f:m=>(1-m.w/B.w)/0.2},{f:m=>(m.o-B.o)/0.2}];
+EX.forEach((e,i)=>{const b=document.createElement('button');b.id='ex'+i;b.onclick=()=>pick(i);$('ex').appendChild(b)});
+function pick(i){cur=i;reps=0;hold=0;locked=false;syms=[];$('reps').textContent=0;EX.forEach((_,j)=>$('ex'+j).className=j===i?'on':'');$('exd').textContent=t().ex[i][1]}
+const LIP=[61,146,91,181,84,17,314,405,321,375,291,409,270,269,267,0,37,39,40,185,61];
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+function analyze(lm){
+ const W=v.videoWidth,H=v.videoHeight,P=i=>({x:lm[i].x*W,y:lm[i].y*H});
+ const a=P(33),b=P(263),ex=b.x-a.x,ey=b.y-a.y,iod=Math.hypot(ex,ey),ux=ex/iod,uy=ey/iod,vx=-uy,vy=ux;
+ const T_=p=>({x:((p.x-a.x)*ux+(p.y-a.y)*uy),y:((p.x-a.x)*vx+(p.y-a.y)*vy)});
+ const R=T_(P(61)),Lf=T_(P(291)),tp=T_(P(13)),u=T_(P(14)),n=T_(P(168));
+ const hd=(R.y-Lf.y)/iod,mid=n.x,wr=Math.abs(R.x-mid),wl=Math.abs(Lf.x-mid),wa=Math.abs(wr-wl)/(wr+wl);
+ return {hd,dev:((R.x+Lf.x)/2-mid)/iod,w:Math.hypot(R.x-Lf.x,R.y-Lf.y)/iod,o:Math.abs(u.y-tp.y)/iod,sym:clamp(100-Math.abs(hd)*500-wa*150,0,100)};
+}
+function draw(lm){
+ c.width=v.videoWidth;c.height=v.videoHeight;ctx.clearRect(0,0,c.width,c.height);
+ ctx.strokeStyle='#34d1b4';ctx.lineWidth=2;ctx.beginPath();
+ LIP.forEach((i,k)=>{const x=lm[i].x*c.width,y=lm[i].y*c.height;k?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();
+ [[61,'#fb923c'],[291,'#60a5fa']].forEach(([i,col])=>{ctx.fillStyle=col;ctx.beginPath();ctx.arc(lm[i].x*c.width,lm[i].y*c.height,6,0,7);ctx.fill()});
+ const e1=lm[33],e2=lm[263];ctx.strokeStyle='rgba(255,255,255,.5)';ctx.setLineDash([6,6]);ctx.beginPath();
+ ctx.moveTo(e1.x*c.width,e1.y*c.height);ctx.lineTo(e2.x*c.width,e2.y*c.height);ctx.stroke();ctx.setLineDash([]);
+}
+function onRes(r){
+ const s=$('side');
+ if(!r.multiFaceLandmarks||!r.multiFaceLandmarks.length){ctx.clearRect(0,0,c.width,c.height);sideFn=()=>{s.textContent=t().noFace;s.className='tip warn'};sideFn();last=null;return}
+ const lm=r.multiFaceLandmarks[0];draw(lm);
+ let m=analyze(lm);
+ sm=sm?Object.fromEntries(Object.keys(m).map(k=>[k,sm[k]*.6+m[k]*.4])):m;m=sm;last=m;
+ $('sym').textContent=m.sym.toFixed(0)+'%';
+ $('m1').textContent=(Math.abs(m.hd)*100).toFixed(1)+'%';
+ $('m2').textContent=(m.dev*100).toFixed(1)+'%';
+ $('m3').textContent=m.w.toFixed(2);$('m4').textContent=m.o.toFixed(2);
+ if(Math.abs(m.hd)<0.015)sideFn=()=>{s.textContent=t().level;s.className='tip'};
+ else{const sd=m.hd>0?'R':'L';sideFn=()=>{s.textContent=t().low(sd);s.className='tip warn'}}
+ sideFn();
+ const p=clamp(EX[cur].f(m),0,1.2);$('pb').style.width=Math.min(p,1)*100+'%';
+ const now=performance.now();
+ if(p>=1&&!locked){hold=hold||now;const h=(now-hold)/1000;$('hb').style.width=Math.min(h,1)*100+'%';
+  if(h>=1){reps++;locked=true;hold=0;const sy=Math.round(m.sym),n=reps;syms.push(m.sym);avgSum+=m.sym;avgN++;
+   $('reps').textContent=reps;$('avg').textContent=(avgSum/avgN).toFixed(0)+'%';
+   setMsg(()=>t().rep(n,sy));
+   if(reps>=10){setMsg(()=>t().setDone);save()}}}
+ else{if(p<0.3)locked=false;if(p<1){hold=0;$('hb').style.width=0}}
+}
+function save(){
+ if(!syms.length)return;
+ try{const h=JSON.parse(localStorage.getItem('mrehab')||'[]');
+  h.unshift({t:Date.now(),e:cur,r:syms.length,s:Math.round(syms.reduce((a,b)=>a+b,0)/syms.length)});
+  localStorage.setItem('mrehab',JSON.stringify(h.slice(0,20)))}catch(e){}
+ syms=[];showHist();
+}
+function showHist(){
+ let h=[];try{h=JSON.parse(localStorage.getItem('mrehab')||'[]')}catch(e){}
+ $('hist').innerHTML=h.length?h.slice(0,6).map(x=>{const d=document.createElement('div');
+  d.textContent=t().hist({t:new Date(x.t).toLocaleString(t().loc),e:typeof x.e==='number'?t().ex[x.e][0]:x.e,r:x.r,s:x.s});return d.outerHTML}).join(''):'<div>'+t().none+'</div>';
+}
+$('save').onclick=()=>{save();setMsg(()=>t().saved)};
+$('cal').onclick=()=>{if(!last){setMsg(()=>t().calFail);return}
+ B={w:last.w,o:last.o};setMsg(()=>t().calOk)};
+const v=$('v'),c=$('c'),ctx=c.getContext('2d');
+$('start').onclick=async()=>{
+ if(run)return;
+ $('start').disabled=true;startKey='starting';$('start').textContent=t().starting;
+ try{
+  if(typeof FaceMesh==='undefined')throw new Error(t().noScript);
+  const fm=new FaceMesh({locateFile:f=>'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/'+f});
+  fm.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:.5,minTrackingConfidence:.5});
+  fm.onResults(onRes);
+  const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:960},height:{ideal:720}},audio:false});
+  v.srcObject=st;await v.play();
+  $('ov').style.display='none';run=true;$('cal').disabled=false;$('save').disabled=false;startKey='on';$('start').textContent=t().on;
+  let busy=false;
+  (async function loop(){if(!busy&&v.readyState>=2){busy=true;try{await fm.send({image:v})}catch(e){}busy=false}requestAnimationFrame(loop)})();
+ }catch(e){
+  $('start').disabled=false;startKey='retry';$('start').textContent=t().retry;
+  $('ov').style.display='flex';
+  const denied=e&&e.name==='NotAllowedError',em=e&&e.message?e.message:String(e);
+  ovFn=()=>denied?t().perm:t().fail(em);$('ov').textContent=ovFn();
+ }
+};
+pick(0);apply();
+</script>
+</body>
+</html>
