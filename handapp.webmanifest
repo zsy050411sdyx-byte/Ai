@@ -1,0 +1,1 @@
+{"name":"手部工伤康复 Hand Rehab","short_name":"手康复","start_url":"./handapp.html","scope":"./","display":"standalone","background_color":"#1f2d3a","theme_color":"#1f2d3a","lang":"zh","icons":[{"src":"handapp-192.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"handapp-512.png","sizes":"512x512","type":"image/png","purpose":"any"}]}

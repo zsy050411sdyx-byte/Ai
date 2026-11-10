@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f2d3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="手康复">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="handapp.webmanifest">
+<link rel="apple-touch-icon" href="handapp-192.png">
+<title>手康复 Hand Rehab 손 재활</title>
+<style>
+:root{--bg:#e9eef0;--panel:#f7f9fa;--ink:#1f2d3a;--mute:#566673;--line:#c1ced5;--hz:#f0b400;--ok:#17766b;--bad:#c4382f}
+@media (prefers-color-scheme:dark){:root{--bg:#10181e;--panel:#1a252d;--ink:#e6edf1;--mute:#9fb0bb;--line:#2f414c;--ok:#45c2b3;--bad:#ff7a70}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Sans KR","Noto Sans SC","PingFang SC","Microsoft YaHei","Malgun Gothic",system-ui,sans-serif;line-height:1.5;padding-top:env(safe-area-inset-top,0px)}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--ok);outline-offset:2px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 8px}
+.top h1{font-size:1.2rem;margin:0}
+.lang{display:flex;gap:4px}
+.lang button{border:1.5px solid var(--line);background:var(--panel);border-radius:6px;padding:4px 9px;min-height:36px;font-size:.85rem}
+.lang button[aria-pressed=true]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.tape{height:8px;background:repeating-linear-gradient(-45deg,var(--hz) 0 11px,#1f2d3a 11px 22px)}
+main{padding:14px 16px calc(84px + env(safe-area-inset-bottom,0px));max-width:560px;margin:0 auto}
+.sum{display:flex;gap:10px;margin-bottom:12px}
+.sum div{flex:1;background:var(--panel);border:1.5px solid var(--line);border-radius:8px;padding:8px 12px}
+.sum b{font-size:1.4rem;display:block;line-height:1.2}
+.sum span{color:var(--mute);font-size:.85rem}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px}
+.chip{border:1.5px solid var(--line);background:var(--panel);border-radius:6px;padding:6px 12px;white-space:nowrap;min-height:40px}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.card{background:var(--panel);border:1.5px solid var(--line);border-left:6px solid var(--hz);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.card.done{border-left-color:var(--ok)}
+.ex{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ex h3{margin:0;font-size:1rem}.ex p{margin:2px 0 0;color:var(--mute);font-size:.88rem}
+.go{background:var(--ink);color:var(--panel);border-radius:8px;padding:8px 16px;min-height:44px;min-width:76px;font-weight:700}
+.done .go{background:var(--ok);color:#fff}
+.h{font-size:1rem;margin:14px 0 8px}
+.mute{color:var(--mute);font-size:.88rem}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--panel);border-top:1.5px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;padding:12px 4px;min-height:56px;font-weight:600;color:var(--mute);border-top:4px solid transparent}
+nav button[aria-current=true]{color:var(--ink);border-top-color:var(--hz)}
+input[type=range]{width:100%;accent-color:var(--ok);height:36px}
+.big{font-size:2.4rem;font-weight:800}
+.save{background:var(--ok);color:#fff;border-radius:8px;padding:10px 18px;min-height:44px;font-weight:700;width:100%}
+.sheet{position:fixed;inset:0;background:var(--ink);color:#e9eef0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;z-index:9;text-align:center;padding-top:calc(24px + env(safe-area-inset-top,0px));padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+.sheet[hidden]{display:none}
+.sheet .n{font-size:6.5rem;font-weight:800;line-height:1;color:var(--hz)}
+.sheet.rest .n{color:#7fd8cc}
+.sheet h2{margin:0;font-size:1.3rem}
+.sheet .stop{border:2px solid #e9eef0;border-radius:8px;padding:10px 26px;min-height:48px;margin-top:14px}
+.warn{border-left-color:var(--bad)}
+svg{width:100%;height:auto;display:block}
+</style>
+</head>
+<body>
+<div class="top"><h1 id="t"></h1><div class="lang" role="group" aria-label="Language"><button data-l="zh">中</button><button data-l="en">EN</button><button data-l="ko">한</button></div></div>
+<div class="tape" aria-hidden="true"></div>
+<main id="m"></main>
+<nav><button data-v="today"></button><button data-v="log"></button><button data-v="learn"></button></nav>
+<div class="sheet" id="sh" hidden role="dialog" aria-live="polite"><h2 id="shn"></h2><div class="n" id="shc">0</div><div id="shp"></div><button class="stop" id="shs"></button></div>
+<script>
+const T={
+zh:{t:"手康复",today:"今日训练",log:"疼痛记录",learn:"安全须知",streak:"连续天数",doneN:"今日完成",st:["急性保护","活动度","肌力","工作模拟"],go:"开始",ok:"已完成",hold:"保持",rest:"放松",stop:"结束",sec:"秒",rep:"次",
+ex:{raise:"抬高患手",free:"健指轻活动",bend:"手指屈伸",oppo:"拇指对指",wrist:"腕屈伸",ball:"握力球",putty:"捏治疗泥",pinch:"捏取螺丝",tool:"握持工具",btn:"按压按钮"},
+pain:"今天的疼痛程度",save:"保存记录",hist:"最近记录",none:"还没有记录",saved:"已保存",
+inj:[["冲床压伤","双手操作按钮，装光幕保护，停机后上锁挂牌。"],["切割伤","戴防割手套，装防护罩，不徒手清理碎屑。"],["烫伤与化学灼伤","戴耐热手套，接触化学液体后冲洗 15 分钟。"],["振动损伤","缩短连续作业时间，使用减振手柄，注意保暖。"]],
+warn:"出现严重出血、断指、大面积烧伤、手指发白发紫或剧烈疼痛时，请立即就医。",
+disc:"本应用仅作科普和训练示例，不能替代诊断。请遵医嘱或咨询作业治疗师；疼痛加重就停止训练。",inst:"安装到手机：iPhone 用 Safari 点分享，选“添加到主屏幕”；安卓用 Chrome 点菜单，选“安装应用”。"},
+en:{t:"Hand Rehab",today:"Today",log:"Pain log",learn:"Safety",streak:"Day streak",doneN:"Done today",st:["Acute","Motion","Strength","Work"],go:"Start",ok:"Done",hold:"Hold",rest:"Relax",stop:"End",sec:"s",rep:"reps",
+ex:{raise:"Raise the hand",free:"Move healthy fingers",bend:"Finger bend and straighten",oppo:"Thumb opposition",wrist:"Wrist flex and extend",ball:"Grip ball",putty:"Squeeze putty",pinch:"Pinch screws",tool:"Hold a tool",btn:"Press buttons"},
+pain:"Pain level today",save:"Save entry",hist:"Recent entries",none:"No entries yet",saved:"Saved",
+inj:[["Press and roller crush","Two-hand controls, light curtains, lockout and tagout before clearing."],["Cuts","Cut-resistant gloves, guards, never clear debris by hand."],["Burns and chemicals","Heat-resistant gloves, rinse chemical contact for 15 minutes."],["Vibration injury","Shorter continuous use, anti-vibration handles, keep hands warm."]],
+warn:"Seek emergency care right away for heavy bleeding, an amputated finger, large burns, white or blue fingers, or severe pain.",
+disc:"For education and training examples only. It does not replace diagnosis. Follow your doctor or occupational therapist, and stop if pain increases.",inst:"Install: on iPhone open in Safari, tap Share, then Add to Home Screen. On Android open in Chrome, tap the menu, then Install app."},
+ko:{t:"손 재활",today:"오늘 훈련",log:"통증 기록",learn:"안전 수칙",streak:"연속 일수",doneN:"오늘 완료",st:["급성기","가동범위","근력","작업"],go:"시작",ok:"완료",hold:"유지",rest:"이완",stop:"종료",sec:"초",rep:"회",
+ex:{raise:"손 올리기",free:"건강한 손가락 움직이기",bend:"손가락 굽혔다 펴기",oppo:"엄지 맞대기",wrist:"손목 굽혔다 펴기",ball:"그립볼 쥐기",putty:"퍼티 쥐기",pinch:"나사 집기",tool:"공구 잡기",btn:"버튼 누르기"},
+pain:"오늘의 통증 정도",save:"기록 저장",hist:"최근 기록",none:"아직 기록이 없습니다",saved:"저장됨",
+inj:[["프레스·롤러 끼임","양손 조작 버튼, 광전자 방호, 정지 후 잠금장치 설치."],["절단·베임","방검 장갑, 방호 덮개, 맨손으로 부스러기 치우지 않기."],["화상·화학 화상","내열 장갑, 화학물질 접촉 시 15분간 세척."],["진동 장애","연속 작업 시간 줄이기, 방진 손잡이, 손 보온."]],
+warn:"심한 출혈, 손가락 절단, 넓은 화상, 손가락이 하얗거나 파랗게 변할 때, 극심한 통증이 있으면 즉시 병원에 가세요.",
+disc:"교육과 훈련 예시용이며 진단을 대체하지 않습니다. 의사 또는 작업치료사의 지시를 따르고, 통증이 심해지면 중단하세요.",inst:"설치: 아이폰은 Safari에서 공유 버튼, 홈 화면에 추가. 안드로이드는 Chrome 메뉴에서 앱 설치."}};
+const S=[[["raise",20,3],["free",2,10]],[["bend",5,10],["oppo",5,10],["wrist",5,10]],[["ball",5,10],["putty",5,10]],[["pinch",3,20],["tool",10,5],["btn",2,20]]];
+let D={lang:"zh",stage:1,done:{},pain:[]},view="today",run=null;
+try{const s=JSON.parse(localStorage.getItem("hr"));if(s)D=Object.assign(D,s);else{const n=(navigator.language||"").slice(0,2);if(T[n])D.lang=n}}catch(e){}
+const save=()=>{try{localStorage.setItem("hr",JSON.stringify(D))}catch(e){}};
+const $=id=>document.getElementById(id);
+const key=d=>{d=d||new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function streak(){let n=0,d=new Date();if(!has(key(d)))d.setDate(d.getDate()-1);while(has(key(d))){n++;d.setDate(d.getDate()-1)}return n}
+const has=k=>D.done[k]&&Object.keys(D.done[k]).length>0;
+function render(){
+  const L=T[D.lang];document.documentElement.lang=D.lang;document.title=L.t;$("t").textContent=L.t;
+  document.querySelectorAll(".lang button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.l===D.lang)));
+  document.querySelectorAll("nav button").forEach(b=>{b.textContent=L[b.dataset.v];b.setAttribute("aria-current",String(b.dataset.v===view))});
+  const m=$("m");
+  if(view==="today"){
+    const td=D.done[key()]||{},all=S.flat().length,cnt=Object.keys(td).length;
+    let h='<div class="sum"><div><b>'+streak()+'</b><span>'+L.streak+'</span></div><div><b>'+cnt+'</b><span>'+L.doneN+'</span></div></div><div class="chips">';
+    L.st.forEach((n,i)=>h+='<button class="chip" data-s="'+i+'" aria-pressed="'+(i===D.stage)+'">'+esc(n)+'</button>');
+    h+='</div>';
+    S[D.stage].forEach(([id,hd,rp])=>{const dn=!!td[id];
+      h+='<div class="card ex'+(dn?" done":"")+'" style="border-left-color:'+(dn?"var(--ok)":"var(--hz)")+'"><div><h3>'+esc(L.ex[id])+'</h3><p>'+L.hold+" "+hd+L.sec+" × "+rp+L.rep+'</p></div><button class="go" data-e="'+id+'">'+(dn?"✓ "+L.ok:L.go)+'</button></div>'});
+    h+='<p class="mute">'+L.inst+'</p>';
+    m.innerHTML=h;
+  }else if(view==="log"){
+    const p=D.pain.slice(-14);let bars="";
+    p.forEach((e,i)=>{const w=300/14,hh=e.v*8;bars+='<rect x="'+(i*w+3)+'" y="'+(90-hh)+'" width="'+(w-6)+'" height="'+Math.max(hh,2)+'" rx="2" fill="#f0b400"/>'});
+    m.innerHTML='<h2 class="h">'+L.pain+'</h2><div class="card"><div class="big" id="pv">3</div><input id="pr" type="range" min="0" max="10" value="3" aria-label="'+L.pain+'"><button class="save" id="ps">'+L.save+'</button><p class="mute" id="pm" aria-live="polite"></p></div><h2 class="h">'+L.hist+'</h2><div class="card">'+(p.length?'<svg viewBox="0 0 300 96"><line x1="0" y1="90.5" x2="300" y2="90.5" stroke="currentColor" opacity=".3"/>'+bars+'</svg>':'<span class="mute">'+L.none+'</span>')+'</div>'+D.pain.slice(-5).reverse().map(e=>'<div class="card"><b>'+e.v+'/10</b> <span class="mute">'+esc(e.d)+'</span></div>').join("");
+    $("pr").oninput=e=>$("pv").textContent=e.target.value;
+    $("ps").onclick=()=>{D.pain.push({d:key(),v:+$("pr").value});if(D.pain.length>200)D.pain.shift();save();render();$("pm")&&($("pm").textContent=L.saved)};
+  }else{
+    m.innerHTML=L.inj.map(i=>'<div class="card"><h3 style="margin:0">'+esc(i[0])+'</h3><p style="margin:4px 0 0">'+esc(i[1])+'</p></div>').join("")+'<div class="card warn"><p style="margin:0">'+esc(L.warn)+'</p></div><p class="mute">'+esc(L.disc)+'</p>';
+  }
+}
+document.addEventListener("click",e=>{
+  const l=e.target.closest(".lang button");if(l){D.lang=l.dataset.l;save();render();return}
+  const n=e.target.closest("nav button");if(n){view=n.dataset.v;render();return}
+  const s=e.target.closest("[data-s]");if(s){D.stage=+s.dataset.s;save();render();return}
+  const g=e.target.closest("[data-e]");if(g)start(g.dataset.e);
+});
+/* guided timer */
+let ac=null;
+function beep(f){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.value=.15;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+.12)}catch(e){}}
+function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+function start(id){
+  const L=T[D.lang],x=S[D.stage].find(a=>a[0]===id);
+  run={id,hold:x[1],reps:x[2],rep:1,ph:"hold",left:x[1]};
+  $("sh").hidden=false;$("shs").textContent=L.stop;$("shn").textContent=L.ex[id];
+  if(ac&&ac.state==="suspended")ac.resume();beep(660);buzz(60);show();
+  run.t=setInterval(tick,1000);
+}
+function show(){const L=T[D.lang];$("shc").textContent=run.left;$("sh").className="sheet"+(run.ph==="rest"?" rest":"");$("shp").textContent=(run.ph==="hold"?L.hold:L.rest)+" · "+run.rep+" / "+run.reps}
+function tick(){
+  run.left--;
+  if(run.left>0){show();return}
+  if(run.ph==="hold"){
+    if(run.rep>=run.reps){finish();return}
+    run.ph="rest";run.left=3;beep(440);buzz(40);
+  }else{run.ph="hold";run.rep++;run.left=run.hold;beep(660);buzz(60)}
+  show();
+}
+function finish(){
+  clearInterval(run.t);const k=key();D.done[k]=D.done[k]||{};D.done[k][run.id]=1;save();
+  beep(880);buzz([100,60,100]);run=null;$("sh").hidden=true;render();
+}
+$("shs").onclick=()=>{if(run){clearInterval(run.t);run=null}$("sh").hidden=true};
+render();
+if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("handapp-sw.js").catch(()=>{}));
+</script>
+</body>
+</html>
