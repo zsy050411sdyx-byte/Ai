@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>手部工伤康复 3D · Hand Injury Rehab · 손 산업재해 재활</title>
+<style>
+:root{--bg:#e9eef0;--panel:#f7f9fa;--ink:#1f2d3a;--mute:#566673;--line:#c1ced5;--hz:#f0b400;--ok:#17766b;--stage:#15222c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10181e;--panel:#1a252d;--ink:#e6edf1;--mute:#9fb0bb;--line:#2f414c;--ok:#45c2b3;--stage:#0b1319;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10181e;--panel:#1a252d;--ink:#e6edf1;--mute:#9fb0bb;--line:#2f414c;--ok:#45c2b3;--stage:#0b1319;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR","Noto Sans SC","PingFang SC","Microsoft YaHei","Malgun Gothic",system-ui,sans-serif;line-height:1.6}
+.wrap{max-width:1000px;margin:0 auto;padding:16px 16px 28px}
+header{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:flex-start}
+h1{font-size:clamp(1.35rem,4.6vw,2rem);line-height:1.2;margin:0 0 4px;font-weight:800}
+.sub{margin:0;color:var(--mute);max-width:34em;font-size:.95rem}
+.lang{display:flex;gap:6px}
+button{font:inherit;color:inherit;cursor:pointer}
+.lang button,.chip{border:1.5px solid var(--line);background:var(--panel);padding:6px 12px;border-radius:6px;min-height:40px}
+.lang button[aria-pressed=true],.chip[aria-pressed=true]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+button:focus-visible{outline:3px solid var(--ok);outline-offset:2px}
+.tape{height:9px;margin:14px 0;background:repeating-linear-gradient(-45deg,var(--hz) 0 11px,#1f2d3a 11px 22px)}
+.grid{display:grid;gap:16px}
+@media (min-width:820px){.grid{grid-template-columns:1.15fr 1fr;align-items:start}.stagebox{position:sticky;top:12px}}
+.stagebox{position:relative;background:var(--stage);border-radius:10px;overflow:hidden}
+canvas{display:block;width:100%;touch-action:none;cursor:grab}
+canvas:active{cursor:grabbing}
+.read{position:absolute;left:0;right:0;bottom:0;padding:10px 14px;color:#e9eef0;font-size:.9rem;background:linear-gradient(transparent,rgba(0,0,0,.65))}
+.read b{color:var(--hz)}
+h2{font-size:1rem;margin:0 0 8px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.card{background:var(--panel);border:1.5px solid var(--line);border-left:6px solid var(--hz);border-radius:8px;padding:12px 14px;margin-bottom:12px}
+.card.rehab{border-left-color:var(--ok)}
+.card h3{margin:0 0 4px;font-size:1.05rem}
+.card p{margin:4px 0}
+.card .prev{color:var(--mute);font-size:.92rem}
+.disc{margin-top:18px;color:var(--mute);font-size:.85rem}
+.nogl{padding:40px 16px;color:#e9eef0;text-align:center}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1 data-i18n="title"></h1>
+    <p class="sub" data-i18n="sub"></p>
+  </div>
+  <div class="lang" role="group" aria-label="Language">
+    <button data-l="zh">中文</button><button data-l="en">English</button><button data-l="ko">한국어</button>
+  </div>
+</header>
+<div class="tape" aria-hidden="true"></div>
+<div class="grid">
+  <div class="stagebox">
+    <canvas id="c" aria-label="3D hand model"></canvas>
+    <div class="read" id="read" aria-live="polite"></div>
+  </div>
+  <div>
+    <h2 data-i18n="sh"></h2>
+    <div class="row" id="scens"></div>
+    <div class="card" id="scard"></div>
+    <h2 data-i18n="gh"></h2>
+    <div class="row" id="stgs"></div>
+    <div class="card rehab" id="gcard"></div>
+  </div>
+</div>
+<p class="disc" data-i18n="disc"></p>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const T={
+zh:{title:"手部工伤康复 3D",sub:"拖动旋转，滚轮缩放，点击手的部位。选择受伤场景和康复阶段，看看手如何训练。",sh:"受伤场景",gh:"康复阶段",
+hint:"点击手的任意部位",inj:"受伤区域",
+n:{tip:"指尖",mid:"指节",base:"掌指关节",palm:"手掌",wrist:"腕部"},
+s:{press:["冲床压伤","手指被压在模具或滚轮之间，常伤及指尖骨和软组织。","预防：双手同时操作按钮，装光幕保护，停机后上锁挂牌。"],
+cut:["切割伤","刀具、锯片或金属边缘割伤肌腱和神经，会影响屈指。","预防：戴防割手套，装防护罩，不徒手清理碎屑。"],
+burn:["烫伤与化学灼伤","高温金属或腐蚀液体损伤手掌皮肤，愈合后容易挛缩变硬。","预防：戴耐热手套，接触化学液体后立即冲洗 15 分钟。"],
+vib:["振动损伤","长期使用冲击钻或打磨机，会损伤腕部和手指的神经血管，出现麻木发白。","预防：缩短连续作业时间，使用减振手柄，注意手部保暖。"]},
+g:[["急性保护期","遵医嘱固定与消肿，抬高患手，轻轻活动没受伤的手指。"],["活动度训练","缓慢屈伸手指，每个动作保持 5 秒，疼痛加重就停下。"],["肌力训练","用握力球或治疗泥，从轻到重，逐步延长握持时间。"],["工作模拟","练习捏螺丝、握工具、按按钮，贴近真实岗位，准备返岗。"]],
+disc:"本页仅作科普和训练示例，不能替代诊断。具体方案请遵医嘱，或咨询作业治疗师。"},
+en:{title:"Hand Injury Rehab in 3D",sub:"Drag to rotate, scroll to zoom, tap any part of the hand. Pick an injury and a rehab stage to see how the hand trains.",sh:"Injury scenario",gh:"Rehab stage",
+hint:"Tap any part of the hand",inj:"Injured area",
+n:{tip:"Fingertip",mid:"Finger joint",base:"Knuckle (MCP)",palm:"Palm",wrist:"Wrist"},
+s:{press:["Press and roller crush","A finger caught between a die or roller. Fingertip bone and soft tissue are often hurt.","Prevention: two-hand controls, light curtains, lockout and tagout before clearing."],
+cut:["Cuts and lacerations","Blades, saws or sharp metal edges can sever tendons and nerves, which limits finger bending.","Prevention: cut-resistant gloves, guards, never clear debris by hand."],
+burn:["Burns and chemical injury","Hot metal or corrosive liquid damages palm skin, which may tighten and stiffen as it heals.","Prevention: heat-resistant gloves, rinse chemical contact for 15 minutes."],
+vib:["Vibration injury","Long use of impact drills or grinders harms nerves and vessels in the wrist and fingers: numbness, white fingers.","Prevention: shorter continuous use, anti-vibration handles, keep hands warm."]},
+g:[["Acute protection","Immobilize and reduce swelling as advised, raise the hand, gently move the uninjured fingers."],["Range of motion","Bend and straighten slowly, hold each position for 5 seconds, stop if pain increases."],["Strength","Use a grip ball or therapy putty, light to heavy, and extend the hold time step by step."],["Work simulation","Practice pinching screws, holding tools and pressing buttons, close to the real job, to prepare for return to work."]],
+disc:"This page is for education and training examples only and does not replace diagnosis. Follow your doctor’s advice or ask an occupational therapist."},
+ko:{title:"손 산업재해 재활 3D",sub:"드래그로 회전, 스크롤로 확대, 손의 부위를 눌러 보세요. 재해 상황과 재활 단계를 고르면 손의 훈련 동작을 볼 수 있습니다.",sh:"재해 상황",gh:"재활 단계",
+hint:"손의 부위를 눌러 보세요",inj:"손상 부위",
+n:{tip:"손끝",mid:"손가락 마디",base:"손허리손가락관절",palm:"손바닥",wrist:"손목"},
+s:{press:["프레스·롤러 끼임","손가락이 금형이나 롤러 사이에 끼어 손끝 뼈와 연부조직을 다치기 쉽습니다.","예방: 양손 조작 버튼, 광전자 방호, 정지 후 잠금장치 설치."],
+cut:["절단·베임","칼날, 톱, 금속 모서리에 힘줄과 신경이 손상되어 손가락 굽힘에 영향을 줍니다.","예방: 방검 장갑, 방호 덮개, 맨손으로 부스러기 치우지 않기."],
+burn:["화상·화학 화상","뜨거운 금속이나 부식성 액체가 손바닥 피부를 손상시키며, 아물면서 굳고 오그라들 수 있습니다.","예방: 내열 장갑, 화학물질 접촉 시 15분간 세척."],
+vib:["진동 장애","충격 드릴이나 연마기를 오래 쓰면 손목과 손가락의 신경·혈관이 손상되어 저림과 창백함이 생깁니다.","예방: 연속 작업 시간 줄이기, 방진 손잡이, 손 보온."]},
+g:[["급성기 보호","의사의 지시에 따라 고정과 부기 관리, 손을 높이 두고 다치지 않은 손가락은 가볍게 움직입니다."],["관절 가동 범위 훈련","손가락을 천천히 굽혔다 펴며 5초씩 유지하고, 통증이 심해지면 멈춥니다."],["근력 훈련","그립볼이나 치료용 퍼티로 가볍게 시작해 점점 유지 시간을 늘립니다."],["작업 모의 훈련","나사 집기, 공구 잡기, 버튼 누르기를 실제 업무와 비슷하게 연습해 복귀를 준비합니다."]],
+disc:"이 페이지는 교육과 훈련 예시용이며 진단을 대체하지 않습니다. 구체적인 방법은 의사 또는 작업치료사와 상의하세요."}};
+
+let lang="zh";try{const s=localStorage.getItem("hl");if(s&&T[s])lang=s;else{const n=(navigator.language||"").slice(0,2);if(T[n])lang=n}}catch(e){const n=(navigator.language||"").slice(0,2);if(T[n])lang=n}
+let scen="press",stg=0,sel=null;
+const SK=["press","cut","burn","vib"];
+
+function injured(part,f){
+  if(scen==="press")return part==="tip";
+  if(scen==="cut")return (part==="mid"||part==="base")&&f!=="t"&&f<=1;
+  if(scen==="burn")return part==="palm";
+  return part==="wrist"||part==="base";
+}
+
+/* ---------- 3D ---------- */
+const cv=document.getElementById("c"),box=cv.parentElement;
+let R=null,meshes=[],fingers=[],thumb=null,thumbG=null;
+const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+try{R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true})}catch(e){R=null}
+if(!R){box.innerHTML='<div class="nogl">WebGL is not available in this browser.</div>'}
+else{
+  const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(38,1,.1,60);cam.position.set(0,.3,10.5);
+  sc.add(new THREE.AmbientLight(0xffffff,.65));
+  const d=new THREE.DirectionalLight(0xffffff,.8);d.position.set(3,5,8);sc.add(d);
+  const hand=new THREE.Group();sc.add(hand);hand.position.y=-.3;
+  const SKIN=0xd8b48f,HURT=0xd9423e;
+  function mk(geo,part,f,pos){const m=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({color:SKIN}));m.userData={part,f};if(pos)m.position.copy(pos);meshes.push(m);return m}
+  function seg(len,r,part,f){
+    const g=new THREE.Group();
+    g.add(mk(new THREE.SphereGeometry(r*1.04,14,10),part,f));
+    const c=mk(new THREE.CylinderGeometry(r*.92,r,len,14),part,f,new THREE.Vector3(0,len/2,0));g.add(c);
+    return g;
+  }
+  hand.add(mk(new THREE.BoxGeometry(2.4,2.2,.7),"palm",0,new THREE.Vector3(0,0,0)));
+  hand.add(mk(new THREE.CylinderGeometry(.85,.95,1.3,18),"wrist",0,new THREE.Vector3(0,-1.7,0)));
+  const L=[[.95,.75,.55],[1.05,.85,.6],[.98,.8,.57],[.8,.62,.48]],RAD=[.27,.28,.27,.23];
+  for(let i=0;i<4;i++){
+    const root=new THREE.Group();root.position.set(-.9+i*.6,1.1,0);hand.add(root);
+    const parts=["base","mid","tip"],gs=[];let par=root;
+    for(let k=0;k<3;k++){const g=seg(L[i][k],RAD[i]*(1-k*.08),parts[k],i);if(k>0)g.position.y=L[i][k-1];par.add(g);gs.push(g);par=g}
+    const cap=mk(new THREE.SphereGeometry(RAD[i]*.84,12,8),"tip",i,new THREE.Vector3(0,L[i][2],0));gs[2].add(cap);
+    fingers.push({gs,cur:[0,0,0]});
+  }
+  thumbG=new THREE.Group();thumbG.position.set(-1.3,-.4,0);thumbG.rotation.z=.8;hand.add(thumbG);
+  const t0=seg(.9,.3,"mid","t"),t1=seg(.75,.27,"tip","t");t1.position.y=.9;t0.add(t1);thumbG.add(t0);
+  t1.add(mk(new THREE.SphereGeometry(.23,12,8),"tip","t",new THREE.Vector3(0,.75,0)));
+  thumb={gs:[t0,t1],cur:0};
+
+  function paint(){meshes.forEach(m=>{const hit=injured(m.userData.part,m.userData.f);const sl=sel&&sel===m.userData.part;m.material.color.setHex(hit?HURT:SKIN);m.material.emissive.setHex(sl?0x555555:0)})}
+
+  function size(){const w=box.clientWidth,h=Math.round(Math.min(w*.95,innerHeight*.62));R.setPixelRatio(Math.min(devicePixelRatio||1,2));R.setSize(w,h,false);cv.style.height=h+"px";cam.aspect=w/h;cam.updateProjectionMatrix()}
+  addEventListener("resize",size);size();
+
+  let ry=.25,rx=.05,drag=false,moved=0,lx=0,ly=0,touched=false;
+  cv.addEventListener("pointerdown",e=>{drag=true;moved=0;lx=e.clientX;ly=e.clientY;touched=true;cv.setPointerCapture(e.pointerId)});
+  cv.addEventListener("pointermove",e=>{if(!drag)return;const dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;moved+=Math.abs(dx)+Math.abs(dy);ry+=dx*.008;rx=Math.max(-1.2,Math.min(1.2,rx+dy*.008))});
+  cv.addEventListener("pointerup",e=>{drag=false;if(moved<5)pick(e)});
+  cv.addEventListener("wheel",e=>{e.preventDefault();cam.position.z=Math.max(6.5,Math.min(14,cam.position.z+e.deltaY*.01))},{passive:false});
+  const ray=new THREE.Raycaster(),v2=new THREE.Vector2();
+  function pick(e){const r=cv.getBoundingClientRect();v2.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);ray.setFromCamera(v2,cam);const h=ray.intersectObjects(meshes);sel=h.length?h[0].object.userData.part:null;paint();readout()}
+
+  function curl(f,t){
+    if(stg===0)return .15;
+    if(stg===1)return .5-.5*Math.cos(t*1.1);
+    if(stg===2)return .88+.12*Math.sin(t*3.2);
+    return f===0?.45+.12*Math.sin(t*1.6):.85;
+  }
+  const MAXA=[1.25,1.4,.95];
+  let T0=performance.now();
+  function loop(now){
+    const t=(now-T0)/1000*(reduce?.25:1);
+    for(let i=0;i<4;i++){const c=curl(i,t),F=fingers[i];for(let k=0;k<3;k++){F.cur[k]+=(c*MAXA[k]-F.cur[k])*.12;F.gs[k].rotation.x=F.cur[k]}}
+    const tc=stg===3?.6:stg===0?.1:curl(1,t)*.9;thumb.cur+=(tc-thumb.cur)*.12;thumb.gs[0].rotation.x=thumb.cur*.7;thumb.gs[1].rotation.x=thumb.cur*.6;thumbG.rotation.y=-thumb.cur*.45;
+    hand.rotation.y=ry+(drag||touched||reduce?0:Math.sin(t*.5)*.18);hand.rotation.x=rx;
+    R.render(sc,cam);requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+  window.__paint=paint;
+}
+
+/* ---------- UI ---------- */
+function readout(){
+  const L=T[lang],el=document.getElementById("read");
+  if(!sel){el.textContent=L.hint;return}
+  const hit=injured(sel,sel==="mid"||sel==="tip"||sel==="base"?0:0);
+  el.innerHTML="<b>"+L.n[sel]+"</b>"+(hit?" · "+L.inj:"");
+}
+function chips(id,items,cur,fn){
+  const el=document.getElementById(id);el.innerHTML="";
+  items.forEach((n,i)=>{const b=document.createElement("button");b.className="chip";b.textContent=n;b.setAttribute("aria-pressed",String(i===cur));b.onclick=()=>fn(i);el.appendChild(b)});
+}
+function render(){
+  const L=T[lang];
+  document.documentElement.lang=lang;document.title=L.title;
+  document.querySelectorAll("[data-i18n]").forEach(e=>e.textContent=L[e.dataset.i18n]);
+  document.querySelectorAll(".lang button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.l===lang)));
+  chips("scens",SK.map(k=>L.s[k][0]),SK.indexOf(scen),i=>{scen=SK[i];sel=null;if(window.__paint)window.__paint();render()});
+  chips("stgs",L.g.map(g=>g[0]),stg,i=>{stg=i;render()});
+  const s=L.s[scen];document.getElementById("scard").innerHTML="<h3></h3><p></p><p class=prev></p>";
+  const sc=document.getElementById("scard").children;sc[0].textContent=s[0];sc[1].textContent=s[1];sc[2].textContent=s[2];
+  const g=L.g[stg];document.getElementById("gcard").innerHTML="<h3></h3><p></p>";
+  const gc=document.getElementById("gcard").children;gc[0].textContent=(stg+1)+". "+g[0];gc[1].textContent=g[1];
+  readout();
+}
+document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{lang=b.dataset.l;try{localStorage.setItem("hl",lang)}catch(e){}render()});
+render();if(window.__paint)window.__paint();
+</script>
+</body>
+</html>
