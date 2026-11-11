@@ -1,236 +1,182 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Mouth Rehab · 嘴部康复 · 구강 재활</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b6bcb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="手部工伤">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>手部工伤 3D · 双中心控制台</title>
 <style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light;
---bg:#f5f7f6;--card:#fff;--tx:#1b2a26;--mu:#667a74;--ac:#0f8f78;--ac2:#e6f5f1;--bd:#dce5e2;--warn:#c2410c}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#101614;--card:#18211e;--tx:#e7f0ed;--mu:#8fa59e;--ac:#34d1b4;--ac2:#18302a;--bd:#263430;--warn:#fb923c}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#101614;--card:#18211e;--tx:#e7f0ed;--mu:#8fa59e;--ac:#34d1b4;--ac2:#18302a;--bd:#263430;--warn:#fb923c}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f3f5f8;--card:#fff;--ink:#1b2430;--mut:#5d6b7c;--line:#d9e0e8;--a:#0b6bcb;--b:#c2410c;--bad:#d1242f;--ok:#1a7f4b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f141b;--card:#18202b;--ink:#e7edf4;--mut:#93a1b3;--line:#2a3544;--a:#58a6ff;--b:#ff9a62;--bad:#ff6b6b;--ok:#4cc38a}}
+:root[data-theme="dark"]{--bg:#0f141b;--card:#18202b;--ink:#e7edf4;--mut:#93a1b3;--line:#2a3544;--a:#58a6ff;--b:#ff9a62;--bad:#ff6b6b;--ok:#4cc38a}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.6 -apple-system,"PingFang SC","Microsoft YaHei","Malgun Gothic",sans-serif}
-main{max-width:960px;margin:0 auto;padding:16px}
-.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
-h1{font-size:20px;margin:4px 0 2px}
-.lang{display:flex;gap:4px}
-.lang button{padding:5px 11px;font-size:13px}
-.sub{color:var(--mu);font-size:13px;margin:0 0 12px}
-.grid{display:grid;gap:12px;grid-template-columns:1fr}
-@media(min-width:800px){.grid{grid-template-columns:1.3fr 1fr}}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px}
-.cam{position:relative;aspect-ratio:4/3;background:#000;border-radius:12px;overflow:hidden}
-.cam .m{position:absolute;inset:0;transform:scaleX(-1)}
-video,canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;padding:20px;background:rgba(0,0,0,.55);font-size:14px}
-.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:8px 14px;cursor:pointer}
-button.p{background:var(--ac);border-color:var(--ac);color:#fff}
-button.on{background:var(--ac2);border-color:var(--ac);color:var(--ac)}
-button:disabled{opacity:.55;cursor:default}
-.k{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed var(--bd);font-size:14px}
-.k b{font-variant-numeric:tabular-nums}
-.big{font-size:38px;font-weight:700;color:var(--ac);line-height:1.1}
-.bar{height:10px;background:var(--ac2);border-radius:6px;overflow:hidden;margin:6px 0}
-.bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .1s}
-.tip{font-size:13px;color:var(--mu)}
-.warn{color:var(--warn)}
-.note{margin-top:12px;font-size:12px;color:var(--mu)}
-h2{font-size:15px;margin:0 0 8px}
-.hist div{font-size:13px;color:var(--mu);padding:3px 0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI","PingFang SC","Noto Sans KR","Microsoft YaHei",sans-serif}
+header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:12px 14px}
+h1{font-size:18px;margin:0}h1 small{display:block;font-weight:400;color:var(--mut);font-size:12px}
+.lang button,.chips button,.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 12px;border-radius:8px;font:inherit;cursor:pointer}
+.lang button.on,.chips button.on{background:var(--a);color:#fff;border-color:var(--a)}
+main{display:grid;gap:12px;padding:0 14px 20px;grid-template-columns:1fr;max-width:1200px;margin:auto}
+@media(min-width:900px){main{grid-template-columns:1.1fr .9fr}.full{grid-column:1/-1}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}
+.card h2{font-size:14px;margin:0 0 8px;color:var(--mut);font-weight:600}
+#cv{width:100%;height:340px;border-radius:8px;touch-action:none;cursor:grab;background:radial-gradient(circle at 50% 40%,rgba(120,140,170,.18),transparent 70%)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+input[type=range]{flex:1;min-width:120px}
+.cam{position:relative;background:#000;border-radius:8px;overflow:hidden;aspect-ratio:4/3}
+.cam video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.cam .ph{position:absolute;inset:0;display:grid;place-items:center;color:#9aa;text-align:center;padding:10px;font-size:13px}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;flex:1}.bar i{display:block;height:100%;width:0;background:var(--ok)}
+.dual{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:700px){.dual{grid-template-columns:1fr 1fr}}
+.ctr{border-radius:10px;padding:12px;border:2px solid}
+.ctr.A{border-color:var(--a)}.ctr.B{border-color:var(--b)}
+.ctr h3{margin:0;font-size:16px}.ctr.A h3{color:var(--a)}.ctr.B h3{color:var(--b)}
+.role{font-size:12px;color:var(--mut);margin-bottom:8px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:14px}.kv b{color:var(--mut);font-weight:500}
+.risk{display:inline-block;padding:1px 10px;border-radius:99px;color:#fff;font-size:12px}
+#log{max-height:130px;overflow:auto;font:12px/1.6 ui-monospace,Menlo,monospace;color:var(--mut);margin-top:8px}
+.note{font-size:12px;color:var(--mut)}
 </style>
 </head>
 <body>
+<header>
+<h1><span id="t_title"></span><small id="t_sub"></small></h1>
+<div class="lang" id="lang"><button data-l="zh">中文</button> <button data-l="en">EN</button> <button data-l="ko">한국어</button></div>
+</header>
 <main>
-<div class="top"><div><h1 data-t="title"></h1><p class="sub" data-t="sub"></p></div>
-<div class="lang"><button id="l-zh">中文</button><button id="l-en">English</button><button id="l-ko">한국어</button></div></div>
-<div class="grid">
 <section class="card">
-<div class="cam">
-<div class="m"><video id="v" playsinline muted></video><canvas id="c"></canvas></div>
-<div class="ov" id="ov"></div>
-</div>
-<div class="row">
-<button class="p" id="start" data-t="start"></button>
-<button id="cal" data-t="cal" disabled></button>
-<button id="save" data-t="save" disabled></button>
-</div>
-<p class="tip" id="msg"></p>
+<h2 id="t_model"></h2>
+<div id="cv"></div>
+<div class="chips" id="chips"></div>
+<div class="row"><span id="t_curl"></span><input type="range" id="curl" min="0" max="100" value="0"></div>
+<div class="note" id="t_hint"></div>
 </section>
 <section class="card">
-<h2 data-t="exT"></h2>
-<div class="row" id="ex" style="margin-top:0"></div>
-<p class="tip" id="exd" style="margin:8px 0 0"></p>
-<div style="margin-top:10px">
-<div class="tip" data-t="prog"></div>
-<div class="big"><span id="reps">0</span><span style="font-size:16px;color:var(--mu)"> / 10</span></div>
-<div class="tip" data-t="amp"></div><div class="bar"><i id="pb"></i></div>
-<div class="tip" data-t="holdT"></div><div class="bar"><i id="hb"></i></div>
-</div>
-<h2 style="margin-top:12px" data-t="symT"></h2>
-<div class="big" id="sym">--</div>
-<div class="tip" id="side"></div>
-<div style="margin-top:6px">
-<div class="k"><span data-t="m1"></span><b id="m1">--</b></div>
-<div class="k"><span data-t="m2"></span><b id="m2">--</b></div>
-<div class="k"><span data-t="m3"></span><b id="m3">--</b></div>
-<div class="k"><span data-t="m4"></span><b id="m4">--</b></div>
-<div class="k"><span data-t="avg"></span><b id="avg">--</b></div>
-</div>
-<div class="hist" style="margin-top:10px"><h2 data-t="histT"></h2><div id="hist"></div></div>
+<h2 id="t_cam"></h2>
+<div class="cam"><video id="vid" playsinline muted></video><div class="ph" id="ph"></div></div>
+<div class="row"><button class="btn" id="camBtn"></button><label><input type="checkbox" id="link"> <span id="t_link"></span></label></div>
+<div class="row"><span id="t_motion"></span><div class="bar"><i id="mbar"></i></div><span id="mval">0%</span></div>
 </section>
+<section class="card full">
+<h2 id="t_console"></h2>
+<div class="dual">
+<div class="ctr A"><h3 id="a_name"></h3><div class="role" id="a_role"></div><div class="kv" id="a_kv"></div></div>
+<div class="ctr B"><h3 id="b_name"></h3><div class="role" id="b_role"></div><div class="kv" id="b_kv"></div></div>
 </div>
-<p class="note" data-t="note"></p>
+<div class="row"><button class="btn" id="sync"></button><span class="note" id="t_disc"></span></div>
+<div id="log"></div>
+</section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/face_mesh.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+const L={
+zh:{title:"手部工伤 3D 康复系统",sub:"双中心协同控制台 · 中 / 英 / 韩",model:"3D 手部模型（拖动旋转）",curl:"手指屈曲",hint:"选择工伤类型，受累部位会在模型上高亮。",cam:"摄像头",camOn:"开启摄像头",camOff:"关闭摄像头",ph:"摄像头未开启",link:"用手部动作驱动模型",motion:"动作幅度",console:"双中心控制台",
+A:"庆云大学",Ar:"康复训练中心 · 临床与康复评估",B:"企业安全中心",Br:"工厂现场 · 事故预防与整改",
+sync:"双中心同步",disc:"演示数据，仅供展示，不构成医疗建议。",err:"无法打开摄像头，请检查权限或使用 HTTPS 页面。",
+k:{inj:"伤情",plan:"康复方案",stage:"阶段",risk:"风险等级",act:"现场整改",rep:"上报"},
+lv:["低","中","高"],
+inj:[["指尖挤压伤","夹压/碾压","急性期：消肿、保护；渐进抓握与精细动作训练","机器加装双手启动与光幕，设置防夹挡板"],
+["割裂伤","刀具/冲压边缘","伤口愈合后：瘢痕按摩、肌腱滑动训练","改用防割手套，刀具加护罩，规范取料"],
+["烧烫伤","高温/化学品","早期关节被动活动、压力衣、防挛缩体位","隔热防护手套，高温区警示与洗眼/冲淋站"],
+["掌指骨折","重物砸压","固定后：邻指主动活动，拆固定后循序加强","重物搬运辅助，设置安全距离与脚手板"],
+["振动/神经损伤","长期工具振动","神经滑动训练，限制连续作业时长","减振工具，轮换作业，每小时休息"]],
+st:["急性期","亚急性期","恢复期"]},
+en:{title:"Hand Injury 3D Rehab System",sub:"Dual-center console · ZH / EN / KO",model:"3D hand model (drag to rotate)",curl:"Finger flexion",hint:"Pick an injury type; the affected area is highlighted on the model.",cam:"Camera",camOn:"Start camera",camOff:"Stop camera",ph:"Camera is off",link:"Drive the model with hand motion",motion:"Motion",console:"Dual-center console",
+A:"Kyungwoon University",Ar:"Rehabilitation Center · clinical & rehab assessment",B:"Enterprise Safety Center",Br:"Factory floor · prevention & corrective action",
+sync:"Sync both centers",disc:"Demo data for illustration only; not medical advice.",err:"Cannot open the camera. Check permissions or use an HTTPS page.",
+k:{inj:"Injury",plan:"Rehab plan",stage:"Stage",risk:"Risk level",act:"Site action",rep:"Reported"},
+lv:["Low","Medium","High"],
+inj:[["Fingertip crush","Pinch / crushing","Acute: edema control, protection; graded grip and fine-motor training","Two-hand start and light curtain on machines; anti-pinch guards"],
+["Laceration","Blades / stamping edges","After healing: scar massage, tendon-gliding exercises","Cut-resistant gloves, blade guards, safe feeding procedure"],
+["Burn / scald","Heat / chemicals","Early passive ROM, pressure garment, anti-contracture positioning","Heat-resistant gloves, hot-zone signage, eyewash/shower station"],
+["Metacarpal fracture","Heavy object impact","After fixation: active motion of free fingers, progressive loading","Lifting aids for heavy loads; safe-distance markings"],
+["Vibration / nerve injury","Long tool vibration","Nerve-gliding exercises; limit continuous work time","Low-vibration tools, job rotation, hourly breaks"]],
+st:["Acute","Subacute","Recovery"]},
+ko:{title:"손 산업재해 3D 재활 시스템",sub:"이중 센터 관제 콘솔 · 중 / 영 / 한",model:"3D 손 모델 (드래그하여 회전)",curl:"손가락 굴곡",hint:"재해 유형을 선택하면 해당 부위가 모델에 강조됩니다.",cam:"카메라",camOn:"카메라 켜기",camOff:"카메라 끄기",ph:"카메라가 꺼져 있습니다",link:"손 움직임으로 모델 제어",motion:"움직임",console:"이중 센터 관제 콘솔",
+A:"경운대학교",Ar:"재활훈련센터 · 임상 및 재활 평가",B:"기업 안전센터",Br:"작업 현장 · 사고 예방 및 시정 조치",
+sync:"두 센터 동기화",disc:"시연용 데이터이며 의료 조언이 아닙니다.",err:"카메라를 열 수 없습니다. 권한을 확인하거나 HTTPS 페이지를 사용하세요.",
+k:{inj:"손상",plan:"재활 계획",stage:"단계",risk:"위험 등급",act:"현장 조치",rep:"보고"},
+lv:["낮음","중간","높음"],
+inj:[["손끝 압궤상","끼임/눌림","급성기: 부종 관리·보호, 단계적 쥐기 및 정밀 동작 훈련","양손 기동·광센서 설치, 끼임 방지 덮개"],
+["열상","칼날/프레스 모서리","치유 후: 흉터 마사지, 힘줄 활주 운동","절단 방지 장갑, 칼날 덮개, 안전한 투입 절차"],
+["화상","고열/화학물질","초기 수동 관절운동, 압박복, 구축 방지 자세","내열 장갑, 고온 구역 표지, 세안·샤워 설비"],
+["중수골 골절","중량물 충격","고정 후: 자유 손가락 능동운동, 점진적 강화","중량물 운반 보조, 안전거리 표시"],
+["진동/신경 손상","공구 진동 장기 노출","신경 활주 운동, 연속 작업 시간 제한","저진동 공구, 작업 교대, 매시간 휴식"]],
+st:["급성기","아급성기","회복기"]}
+};
+const risks=[2,1,2,2,1],stg=[0,2,1,1,2],zones=['tip','palm','palm','mid','wrist'],rc=['#1a7f4b','#d97706','#d1242f'];
+let lang='zh',sel=0,curl=0,tgtCurl=0;
 const $=id=>document.getElementById(id);
-const T={
-zh:{loc:'zh-CN',htmlLang:'zh-CN',
-title:'面瘫后遗症 · 嘴部康复训练',
-sub:'摄像头实时识别嘴部姿态，评估左右对称度，并引导做康复动作。视频仅在本机浏览器处理，不会上传。',
-start:'打开摄像头',starting:'正在启动…',on:'摄像头已开启',retry:'重新打开摄像头',cal:'记录静息基线',save:'保存本次',
-tip:'提示：先放松面部，点「记录静息基线」，再选择动作训练。',
-ov:'点击下方「打开摄像头」开始。请正对镜头，光线均匀，保持面部完整入镜。',
-exT:'训练动作',prog:'已完成 / 目标 10 次',amp:'动作幅度',holdT:'保持计时（需持续约 1 秒）',symT:'实时对称度',
-m1:'嘴角高度差',m2:'嘴部中线偏移',m3:'嘴宽（相对）',m4:'张口度（相对）',avg:'本次平均对称度',histT:'历史记录',none:'暂无记录',
-note:'本工具仅用于康复训练辅助与自我观察，不构成医学诊断。请遵医嘱或康复师指导训练；如出现疼痛、抽搐加重等不适请停止并就医。画面为镜像显示，「右侧」指您自己的右侧嘴角。',
-ex:[['微笑','嘴唇闭合，向两侧缓慢微笑，尽量让两侧嘴角同时上提。'],['大笑露齿','用力向两侧咧开嘴露出牙齿，保持左右同样用力。'],['噘嘴','像吹口哨一样向前噘起嘴唇，嘴角向中间收拢。'],['张口','缓慢张大嘴巴，下颌保持居中，不要歪向一侧。']],
-noFace:'未检测到人脸，请正对镜头',level:'嘴角基本水平对称',low:s=>'您的'+(s=='R'?'右':'左')+'侧嘴角偏低',
-rep:(n,s)=>'完成第 '+n+' 次，对称度 '+s+'%。放松后继续。',setDone:'本组 10 次完成，已自动保存。',saved:'已保存。',
-calOk:'已记录静息基线，请开始训练。',calFail:'未识别到人脸，无法记录基线。',
-perm:'摄像头权限被拒绝，请在浏览器地址栏允许摄像头后重试。',fail:m=>'启动失败：'+m,noScript:'识别模型脚本未能加载，请检查网络。',
-hist:h=>h.t+' · '+h.e+' · '+h.r+' 次 · 平均对称度 '+h.s+'%'},
-en:{loc:'en-US',htmlLang:'en',
-title:'Facial Palsy Sequelae · Mouth Rehab Training',
-sub:'Tracks your mouth posture through the camera in real time, scores left/right symmetry, and guides rehab exercises. Video is processed in your browser only and never uploaded.',
-start:'Start camera',starting:'Starting…',on:'Camera on',retry:'Retry camera',cal:'Record resting baseline',save:'Save session',
-tip:'Tip: relax your face, tap “Record resting baseline”, then pick an exercise.',
-ov:'Tap “Start camera” below. Face the camera with even lighting and keep your whole face in frame.',
-exT:'Exercises',prog:'Done / goal 10 reps',amp:'Movement range',holdT:'Hold timer (about 1 second)',symT:'Live symmetry',
-m1:'Mouth-corner height gap',m2:'Mouth midline shift',m3:'Mouth width (relative)',m4:'Mouth opening (relative)',avg:'Session average symmetry',histT:'History',none:'No records yet',
-note:'This tool is only an aid for rehab practice and self-observation, not a medical diagnosis. Follow your doctor or therapist’s guidance; stop and seek care if you feel pain or twitching worsens. The view is mirrored: “right” means your own right mouth corner.',
-ex:[['Smile','Close your lips and smile slowly, lifting both corners together.'],['Big smile (teeth)','Stretch your lips wide to show teeth, using equal effort on both sides.'],['Pucker','Purse your lips forward as if whistling, drawing the corners inward.'],['Open mouth','Open wide slowly, keeping your jaw centered and not drifting to one side.']],
-noFace:'No face detected. Please face the camera.',level:'Mouth corners are roughly level',low:s=>'Your '+(s=='R'?'right':'left')+' mouth corner is lower',
-rep:(n,s)=>'Rep '+n+' done, symmetry '+s+'%. Relax, then continue.',setDone:'Set of 10 complete — saved automatically.',saved:'Saved.',
-calOk:'Baseline recorded. You can start training.',calFail:'No face detected, cannot record baseline.',
-perm:'Camera permission denied. Allow camera access in your browser and try again.',fail:m=>'Failed to start: '+m,noScript:'The recognition model script failed to load. Check your network.',
-hist:h=>h.t+' · '+h.e+' · '+h.r+' reps · avg symmetry '+h.s+'%'},
-ko:{loc:'ko-KR',htmlLang:'ko',
-title:'안면마비 후유증 · 입 재활 훈련',
-sub:'카메라로 입 모양을 실시간 인식해 좌우 대칭도를 평가하고 재활 동작을 안내합니다. 영상은 브라우저에서만 처리되며 업로드되지 않습니다.',
-start:'카메라 켜기',starting:'시작 중…',on:'카메라 켜짐',retry:'카메라 다시 켜기',cal:'안정 시 기준값 기록',save:'이번 훈련 저장',
-tip:'안내: 얼굴 힘을 뺀 뒤 「안정 시 기준값 기록」을 누르고 동작을 선택하세요.',
-ov:'아래 「카메라 켜기」를 누르세요. 카메라를 정면으로 바라보고, 조명을 고르게 하며 얼굴 전체가 보이게 해 주세요.',
-exT:'훈련 동작',prog:'완료 / 목표 10회',amp:'동작 크기',holdT:'유지 시간 (약 1초)',symT:'실시간 대칭도',
-m1:'입꼬리 높이 차이',m2:'입 중심선 편차',m3:'입 너비(상대값)',m4:'입 벌림(상대값)',avg:'이번 평균 대칭도',histT:'기록',none:'기록 없음',
-note:'이 도구는 재활 연습과 자가 관찰을 돕기 위한 것이며 의학적 진단이 아닙니다. 의사나 재활치료사의 지도에 따라 훈련하고, 통증이나 경련이 심해지면 중단하고 진료받으세요. 화면은 거울 모드이며 「오른쪽」은 본인의 오른쪽 입꼬리입니다.',
-ex:[['미소','입술을 다문 채 천천히 웃으며 양쪽 입꼬리를 함께 올리세요.'],['크게 웃기(치아)','입을 양옆으로 크게 벌려 치아를 드러내고, 좌우 같은 힘을 주세요.'],['입 오므리기','휘파람 불듯 입술을 앞으로 내밀어 입꼬리를 가운데로 모으세요.'],['입 벌리기','턱이 한쪽으로 치우치지 않게 중앙을 유지하며 천천히 크게 벌리세요.']],
-noFace:'얼굴이 감지되지 않습니다. 카메라를 정면으로 봐 주세요.',level:'입꼬리가 대체로 수평입니다',low:s=>'본인의 '+(s=='R'?'오른쪽':'왼쪽')+' 입꼬리가 더 낮습니다',
-rep:(n,s)=>n+'회 완료, 대칭도 '+s+'%. 힘을 빼고 계속하세요.',setDone:'10회 완료 — 자동 저장되었습니다.',saved:'저장되었습니다.',
-calOk:'기준값을 기록했습니다. 훈련을 시작하세요.',calFail:'얼굴이 감지되지 않아 기준값을 기록할 수 없습니다.',
-perm:'카메라 권한이 거부되었습니다. 브라우저에서 카메라를 허용한 뒤 다시 시도하세요.',fail:m=>'시작 실패: '+m,noScript:'인식 모델 스크립트를 불러오지 못했습니다. 네트워크를 확인하세요.',
-hist:h=>h.t+' · '+h.e+' · '+h.r+'회 · 평균 대칭도 '+h.s+'%'}
+function logAdd(s){const d=document.createElement('div');d.textContent=new Date().toLocaleTimeString()+'  '+s;$('log').prepend(d)}
+function render(){
+ const t=L[lang],i=t.inj[sel];document.documentElement.lang=lang;document.title=t.title;
+ $('t_title').textContent=t.title;$('t_sub').textContent=t.sub;$('t_model').textContent=t.model;$('t_curl').textContent=t.curl;$('t_hint').textContent=t.hint;
+ $('t_cam').textContent=t.cam;$('t_link').textContent=t.link;$('t_motion').textContent=t.motion;$('t_console').textContent=t.console;$('t_disc').textContent=t.disc;
+ $('camBtn').textContent=stream?t.camOff:t.camOn;$('ph').textContent=t.ph;$('ph').style.display=stream?'none':'grid';$('sync').textContent=t.sync;
+ $('a_name').textContent=t.A;$('a_role').textContent=t.Ar;$('b_name').textContent=t.B;$('b_role').textContent=t.Br;
+ const rk=`<span class="risk" style="background:${rc[risks[sel]]}">${t.lv[risks[sel]]}</span>`;
+ $('a_kv').innerHTML=`<b>${t.k.inj}</b><span>${i[0]}</span><b>${t.k.stage}</b><span>${t.st[stg[sel]]}</span><b>${t.k.plan}</b><span>${i[2]}</span>`;
+ $('b_kv').innerHTML=`<b>${t.k.inj}</b><span>${i[0]} · ${i[1]}</span><b>${t.k.risk}</b><span>${rk}</span><b>${t.k.act}</b><span>${i[3]}</span>`;
+ $('chips').innerHTML=t.inj.map((x,n)=>`<button data-n="${n}" class="${n==sel?'on':''}">${x[0]}</button>`).join('');
+ document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.l==lang));
+}
+$('lang').onclick=e=>{if(e.target.dataset.l){lang=e.target.dataset.l;render()}};
+$('chips').onclick=e=>{const n=e.target.dataset.n;if(n!==undefined){sel=+n;render();logAdd(L[lang].A+' ⇄ '+L[lang].B+' : '+L[lang].inj[sel][0])}};
+$('sync').onclick=()=>logAdd(L[lang].A+' → '+L[lang].B+' | '+L[lang].inj[sel][0]+' | '+L[lang].lv[risks[sel]]);
+$('curl').oninput=e=>{tgtCurl=e.target.value/100};
+
+/* 3D hand */
+const host=$('cv'),scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,1,.1,50);cam.position.set(0,1.2,7.5);cam.lookAt(0,1.2,0);
+const ren=new THREE.WebGLRenderer({antialias:true,alpha:true});ren.setPixelRatio(Math.min(devicePixelRatio,2));host.appendChild(ren.domElement);
+scene.add(new THREE.AmbientLight(0xffffff,.7));const dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(3,5,6);scene.add(dl);
+const root=new THREE.Group();scene.add(root);const tagged=[];const skin=0xe8b896;
+function mk(geo,zone){const m=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:skin,roughness:.7,emissive:0x000000}));m.userData.zone=zone;tagged.push(m);return m}
+const palm=mk(new THREE.BoxGeometry(2.1,2,.7),'palm');palm.position.y=0;root.add(palm);
+const wrist=mk(new THREE.CylinderGeometry(.55,.65,1.2,24),'wrist');wrist.position.y=-1.5;root.add(wrist);
+const fingers=[];
+function finger(x,y,len,rz){const g=new THREE.Group();g.position.set(x,y,0);g.rotation.z=rz;root.add(g);const js=[];let parent=g;const sl=len/3;
+ for(let k=0;k<3;k++){const j=new THREE.Group();if(k>0)j.position.y=sl;parent.add(j);const seg=mk(new THREE.CylinderGeometry(.19-k*.02,.2-k*.02,sl,16),k==2?'tip':'mid');seg.position.y=sl/2;j.add(seg);
+  const kn=mk(new THREE.SphereGeometry(.2-k*.02,16,12),k==2?'tip':'mid');j.add(kn);js.push(j);parent=j}
+ const t=mk(new THREE.SphereGeometry(.17,16,12),'tip');t.position.y=sl;js[2].add(t);fingers.push(js)}
+[[-.78,1,1.2],[-.26,1,1.4],[.26,1,1.3],[.78,1,1.0]].forEach(a=>finger(a[0],a[1],a[2],0));
+finger(1.1,-.5,1.1,-1.0);
+let rx=-.2,ry=.5,drag=false,px=0,py=0,idle=0;
+host.addEventListener('pointerdown',e=>{drag=true;px=e.clientX;py=e.clientY;host.setPointerCapture(e.pointerId)});
+host.addEventListener('pointerup',()=>{drag=false});
+host.addEventListener('pointermove',e=>{if(!drag)return;ry+=(e.clientX-px)*.01;rx+=(e.clientY-py)*.01;rx=Math.max(-1.2,Math.min(1.2,rx));px=e.clientX;py=e.clientY;idle=0});
+function resize(){const w=host.clientWidth,h=host.clientHeight;ren.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix()}
+addEventListener('resize',resize);resize();
+let t0=0;
+(function loop(ts){requestAnimationFrame(loop);const p=ts/1000;
+ if(!drag){idle+=.016;if(idle>3)ry+=.004}
+ root.rotation.set(rx,ry,0);
+ curl+=(tgtCurl-curl)*.12;
+ fingers.forEach((js,n)=>js.forEach((j,k)=>{const a=n==4?(k==0?.2:.9)*curl:(k==0?1.1:k==1?1.3:.9)*curl;j.rotation.x=a}));
+ const pulse=.35+.3*Math.sin(p*5);
+ tagged.forEach(m=>{const on=m.userData.zone==zones[sel];m.material.emissive.setHex(on?0xff2020:0);m.material.emissiveIntensity=on?pulse:0});
+ ren.render(scene,cam)})(0);
+
+/* camera + motion */
+let stream=null,prev=null,mt=null;const vid=$('vid'),cv2=document.createElement('canvas');cv2.width=64;cv2.height=48;const cx=cv2.getContext('2d',{willReadFrequently:true});
+$('camBtn').onclick=async()=>{
+ if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;vid.srcObject=null;clearInterval(mt);prev=null;$('mbar').style.width='0';$('mval').textContent='0%';render();return}
+ try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});vid.srcObject=stream;await vid.play();render();
+  let sm=0;mt=setInterval(()=>{cx.drawImage(vid,0,0,64,48);const d=cx.getImageData(0,0,64,48).data;
+   if(prev){let s=0;for(let i=0;i<d.length;i+=4)s+=Math.abs(d[i]-prev[i])+Math.abs(d[i+1]-prev[i+1])+Math.abs(d[i+2]-prev[i+2]);const m=Math.min(1,s/(d.length/4)/60);sm+=(m-sm)*.4;
+    $('mbar').style.width=(sm*100)+'%';$('mval').textContent=Math.round(sm*100)+'%';if($('link').checked)tgtCurl=Math.min(1,sm*2.5);}
+   prev=new Uint8ClampedArray(d)},100)}
+ catch(e){stream=null;$('ph').style.display='grid';$('ph').textContent=L[lang].err}
 };
-let L='zh';
-try{const s=localStorage.getItem('mlang');if(s&&T[s])L=s;else{const n=(navigator.language||'').slice(0,2);if(T[n])L=n}}catch(e){}
-const t=()=>T[L];
-let startKey='start',msgFn=()=>t().tip,ovFn=()=>t().ov,sideFn=null,B={w:0.55,o:0.02},cur=0,reps=0,hold=0,locked=false,run=false,last=null,sm=null,syms=[],avgSum=0,avgN=0;
-const setMsg=f=>{msgFn=f;$('msg').textContent=f()};
-function apply(){
- document.documentElement.lang=t().htmlLang;
- document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t()[e.dataset.t]);
- $('start').textContent=t()[startKey];$('msg').textContent=msgFn();$('ov').textContent=ovFn();
- ['zh','en','ko'].forEach(k=>$('l-'+k).className=k===L?'on':'');
- $('exd').textContent=t().ex[cur][1];
- t().ex.forEach((e,i)=>$('ex'+i).textContent=e[0]);
- if(sideFn)sideFn();else{$('side').textContent=t().noFace;$('side').className='tip'}
- showHist();
-}
-['zh','en','ko'].forEach(k=>$('l-'+k).onclick=()=>{L=k;try{localStorage.setItem('mlang',k)}catch(e){}apply()});
-const EX=[
-{f:m=>(m.w/B.w-1)/0.15},{f:m=>(m.w/B.w-1)/0.3},{f:m=>(1-m.w/B.w)/0.2},{f:m=>(m.o-B.o)/0.2}];
-EX.forEach((e,i)=>{const b=document.createElement('button');b.id='ex'+i;b.onclick=()=>pick(i);$('ex').appendChild(b)});
-function pick(i){cur=i;reps=0;hold=0;locked=false;syms=[];$('reps').textContent=0;EX.forEach((_,j)=>$('ex'+j).className=j===i?'on':'');$('exd').textContent=t().ex[i][1]}
-const LIP=[61,146,91,181,84,17,314,405,321,375,291,409,270,269,267,0,37,39,40,185,61];
-const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
-function analyze(lm){
- const W=v.videoWidth,H=v.videoHeight,P=i=>({x:lm[i].x*W,y:lm[i].y*H});
- const a=P(33),b=P(263),ex=b.x-a.x,ey=b.y-a.y,iod=Math.hypot(ex,ey),ux=ex/iod,uy=ey/iod,vx=-uy,vy=ux;
- const T_=p=>({x:((p.x-a.x)*ux+(p.y-a.y)*uy),y:((p.x-a.x)*vx+(p.y-a.y)*vy)});
- const R=T_(P(61)),Lf=T_(P(291)),tp=T_(P(13)),u=T_(P(14)),n=T_(P(168));
- const hd=(R.y-Lf.y)/iod,mid=n.x,wr=Math.abs(R.x-mid),wl=Math.abs(Lf.x-mid),wa=Math.abs(wr-wl)/(wr+wl);
- return {hd,dev:((R.x+Lf.x)/2-mid)/iod,w:Math.hypot(R.x-Lf.x,R.y-Lf.y)/iod,o:Math.abs(u.y-tp.y)/iod,sym:clamp(100-Math.abs(hd)*500-wa*150,0,100)};
-}
-function draw(lm){
- c.width=v.videoWidth;c.height=v.videoHeight;ctx.clearRect(0,0,c.width,c.height);
- ctx.strokeStyle='#34d1b4';ctx.lineWidth=2;ctx.beginPath();
- LIP.forEach((i,k)=>{const x=lm[i].x*c.width,y=lm[i].y*c.height;k?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();
- [[61,'#fb923c'],[291,'#60a5fa']].forEach(([i,col])=>{ctx.fillStyle=col;ctx.beginPath();ctx.arc(lm[i].x*c.width,lm[i].y*c.height,6,0,7);ctx.fill()});
- const e1=lm[33],e2=lm[263];ctx.strokeStyle='rgba(255,255,255,.5)';ctx.setLineDash([6,6]);ctx.beginPath();
- ctx.moveTo(e1.x*c.width,e1.y*c.height);ctx.lineTo(e2.x*c.width,e2.y*c.height);ctx.stroke();ctx.setLineDash([]);
-}
-function onRes(r){
- const s=$('side');
- if(!r.multiFaceLandmarks||!r.multiFaceLandmarks.length){ctx.clearRect(0,0,c.width,c.height);sideFn=()=>{s.textContent=t().noFace;s.className='tip warn'};sideFn();last=null;return}
- const lm=r.multiFaceLandmarks[0];draw(lm);
- let m=analyze(lm);
- sm=sm?Object.fromEntries(Object.keys(m).map(k=>[k,sm[k]*.6+m[k]*.4])):m;m=sm;last=m;
- $('sym').textContent=m.sym.toFixed(0)+'%';
- $('m1').textContent=(Math.abs(m.hd)*100).toFixed(1)+'%';
- $('m2').textContent=(m.dev*100).toFixed(1)+'%';
- $('m3').textContent=m.w.toFixed(2);$('m4').textContent=m.o.toFixed(2);
- if(Math.abs(m.hd)<0.015)sideFn=()=>{s.textContent=t().level;s.className='tip'};
- else{const sd=m.hd>0?'R':'L';sideFn=()=>{s.textContent=t().low(sd);s.className='tip warn'}}
- sideFn();
- const p=clamp(EX[cur].f(m),0,1.2);$('pb').style.width=Math.min(p,1)*100+'%';
- const now=performance.now();
- if(p>=1&&!locked){hold=hold||now;const h=(now-hold)/1000;$('hb').style.width=Math.min(h,1)*100+'%';
-  if(h>=1){reps++;locked=true;hold=0;const sy=Math.round(m.sym),n=reps;syms.push(m.sym);avgSum+=m.sym;avgN++;
-   $('reps').textContent=reps;$('avg').textContent=(avgSum/avgN).toFixed(0)+'%';
-   setMsg(()=>t().rep(n,sy));
-   if(reps>=10){setMsg(()=>t().setDone);save()}}}
- else{if(p<0.3)locked=false;if(p<1){hold=0;$('hb').style.width=0}}
-}
-function save(){
- if(!syms.length)return;
- try{const h=JSON.parse(localStorage.getItem('mrehab')||'[]');
-  h.unshift({t:Date.now(),e:cur,r:syms.length,s:Math.round(syms.reduce((a,b)=>a+b,0)/syms.length)});
-  localStorage.setItem('mrehab',JSON.stringify(h.slice(0,20)))}catch(e){}
- syms=[];showHist();
-}
-function showHist(){
- let h=[];try{h=JSON.parse(localStorage.getItem('mrehab')||'[]')}catch(e){}
- $('hist').innerHTML=h.length?h.slice(0,6).map(x=>{const d=document.createElement('div');
-  d.textContent=t().hist({t:new Date(x.t).toLocaleString(t().loc),e:typeof x.e==='number'?t().ex[x.e][0]:x.e,r:x.r,s:x.s});return d.outerHTML}).join(''):'<div>'+t().none+'</div>';
-}
-$('save').onclick=()=>{save();setMsg(()=>t().saved)};
-$('cal').onclick=()=>{if(!last){setMsg(()=>t().calFail);return}
- B={w:last.w,o:last.o};setMsg(()=>t().calOk)};
-const v=$('v'),c=$('c'),ctx=c.getContext('2d');
-$('start').onclick=async()=>{
- if(run)return;
- $('start').disabled=true;startKey='starting';$('start').textContent=t().starting;
- try{
-  if(typeof FaceMesh==='undefined')throw new Error(t().noScript);
-  const fm=new FaceMesh({locateFile:f=>'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/'+f});
-  fm.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:.5,minTrackingConfidence:.5});
-  fm.onResults(onRes);
-  const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:960},height:{ideal:720}},audio:false});
-  v.srcObject=st;await v.play();
-  $('ov').style.display='none';run=true;$('cal').disabled=false;$('save').disabled=false;startKey='on';$('start').textContent=t().on;
-  let busy=false;
-  (async function loop(){if(!busy&&v.readyState>=2){busy=true;try{await fm.send({image:v})}catch(e){}busy=false}requestAnimationFrame(loop)})();
- }catch(e){
-  $('start').disabled=false;startKey='retry';$('start').textContent=t().retry;
-  $('ov').style.display='flex';
-  const denied=e&&e.name==='NotAllowedError',em=e&&e.message?e.message:String(e);
-  ovFn=()=>denied?t().perm:t().fail(em);$('ov').textContent=ovFn();
- }
-};
-pick(0);apply();
+render();logAdd(L[lang].A+' ⇄ '+L[lang].B);
+if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 </script>
 </body>
 </html>
