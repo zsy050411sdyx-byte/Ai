@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>手部工伤 3D · 双中心控制台</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f3f5f8;--card:#fff;--ink:#1b2430;--mut:#5d6b7c;--line:#d9e0e8;--a:#0b6bcb;--b:#c2410c;--bad:#d1242f;--ok:#1a7f4b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f141b;--card:#18202b;--ink:#e7edf4;--mut:#93a1b3;--line:#2a3544;--a:#58a6ff;--b:#ff9a62;--bad:#ff6b6b;--ok:#4cc38a}}
+:root[data-theme="dark"]{--bg:#0f141b;--card:#18202b;--ink:#e7edf4;--mut:#93a1b3;--line:#2a3544;--a:#58a6ff;--b:#ff9a62;--bad:#ff6b6b;--ok:#4cc38a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI","PingFang SC","Noto Sans KR","Microsoft YaHei",sans-serif}
+header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:12px 14px}
+h1{font-size:18px;margin:0}h1 small{display:block;font-weight:400;color:var(--mut);font-size:12px}
+.lang button,.chips button,.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 12px;border-radius:8px;font:inherit;cursor:pointer}
+.lang button.on,.chips button.on{background:var(--a);color:#fff;border-color:var(--a)}
+main{display:grid;gap:12px;padding:0 14px 20px;grid-template-columns:1fr;max-width:1200px;margin:auto}
+@media(min-width:900px){main{grid-template-columns:1.1fr .9fr}.full{grid-column:1/-1}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}
+.card h2{font-size:14px;margin:0 0 8px;color:var(--mut);font-weight:600}
+#cv{width:100%;height:400px;border-radius:8px;touch-action:none;cursor:grab;background:radial-gradient(circle at 50% 40%,rgba(120,140,170,.18),transparent 70%)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+input[type=range]{flex:1;min-width:120px}
+.cam{position:relative;background:#000;border-radius:8px;overflow:hidden;aspect-ratio:4/3}
+.cam video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.cam .ph{position:absolute;inset:0;display:grid;place-items:center;color:#9aa;text-align:center;padding:10px;font-size:13px}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;flex:1}.bar i{display:block;height:100%;width:0;background:var(--ok)}
+.dual{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:700px){.dual{grid-template-columns:1fr 1fr}}
+.ctr{border-radius:10px;padding:12px;border:2px solid}
+.ctr.A{border-color:var(--a)}.ctr.B{border-color:var(--b)}
+.ctr h3{margin:0;font-size:16px}.ctr.A h3{color:var(--a)}.ctr.B h3{color:var(--b)}
+.role{font-size:12px;color:var(--mut);margin-bottom:8px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:14px}.kv b{color:var(--mut);font-weight:500}
+.risk{display:inline-block;padding:1px 10px;border-radius:99px;color:#fff;font-size:12px}
+#log{max-height:130px;overflow:auto;font:12px/1.6 ui-monospace,Menlo,monospace;color:var(--mut);margin-top:8px}
+.note{font-size:12px;color:var(--mut)}
+.layers{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:14px}
+.sinfo{margin-top:8px;padding:8px 10px;border-left:4px solid var(--line);background:rgba(120,140,170,.12);border-radius:6px;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+<h1><span id="t_title"></span><small id="t_sub"></small></h1>
+<div class="lang" id="lang"><button data-l="zh">中文</button> <button data-l="en">EN</button> <button data-l="ko">한국어</button></div>
+</header>
+<main>
+<section class="card">
+<h2 id="t_model"></h2>
+<div id="cv"></div>
+<div class="chips" id="chips"></div>
+<div class="row"><span id="t_curl"></span><input type="range" id="curl" min="0" max="100" value="0"></div>
+<div class="layers"><label><input type="checkbox" id="ly_bone" checked> <span id="t_bone"></span></label><label><input type="checkbox" id="ly_muscle" checked> <span id="t_muscle"></span></label><label><input type="checkbox" id="ly_nerve" checked> <span id="t_nerve"></span></label></div>
+<div class="row"><span id="t_skin"></span><input type="range" id="skin" min="5" max="100" value="35"></div>
+<div class="chips" id="schips"></div>
+<div class="sinfo" id="sinfo"></div>
+<div class="note" id="t_hint"></div>
+</section>
+<section class="card">
+<h2 id="t_cam"></h2>
+<div class="cam"><video id="vid" playsinline muted></video><div class="ph" id="ph"></div></div>
+<div class="row"><button class="btn" id="camBtn"></button><label><input type="checkbox" id="link"> <span id="t_link"></span></label></div>
+<div class="row"><span id="t_motion"></span><div class="bar"><i id="mbar"></i></div><span id="mval">0%</span></div>
+</section>
+<section class="card full">
+<h2 id="t_console"></h2>
+<div class="dual">
+<div class="ctr A"><h3 id="a_name"></h3><div class="role" id="a_role"></div><div class="kv" id="a_kv"></div></div>
+<div class="ctr B"><h3 id="b_name"></h3><div class="role" id="b_role"></div><div class="kv" id="b_kv"></div></div>
+</div>
+<div class="row"><button class="btn" id="sync"></button><span class="note" id="t_disc"></span></div>
+<div id="log"></div>
+</section>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const L={
+zh:{title:"手部工伤 3D 康复系统",sub:"双中心协同控制台 · 中 / 英 / 韩",model:"3D 手部模型（拖动旋转）",curl:"手指屈曲",hint:"选择工伤类型，受累部位会在模型上高亮。",cam:"摄像头",camOn:"开启摄像头",camOff:"关闭摄像头",ph:"摄像头未开启",link:"用手部动作驱动模型",motion:"动作幅度",console:"双中心控制台",
+A:"庆云大学",Ar:"康复训练中心 · 临床与康复评估",B:"企业安全中心",Br:"工厂现场 · 事故预防与整改",
+sync:"双中心同步",disc:"演示数据，仅供展示，不构成医疗建议。",err:"无法打开摄像头，请检查权限或使用 HTTPS 页面。",
+k:{inj:"伤情",plan:"康复方案",stage:"阶段",risk:"风险等级",act:"现场整改",rep:"上报"},
+lv:["低","中","高"],
+inj:[["指尖挤压伤","夹压/碾压","急性期：消肿、保护；渐进抓握与精细动作训练","机器加装双手启动与光幕，设置防夹挡板"],
+["割裂伤","刀具/冲压边缘","伤口愈合后：瘢痕按摩、肌腱滑动训练","改用防割手套，刀具加护罩，规范取料"],
+["烧烫伤","高温/化学品","早期关节被动活动、压力衣、防挛缩体位","隔热防护手套，高温区警示与洗眼/冲淋站"],
+["掌指骨折","重物砸压","固定后：邻指主动活动，拆固定后循序加强","重物搬运辅助，设置安全距离与脚手板"],
+["振动/神经损伤","长期工具振动","神经滑动训练，限制连续作业时长","减振工具，轮换作业，每小时休息"]],
+st:["急性期","亚急性期","恢复期"],X:{bone:"骨骼",muscle:"肌肉/肌腱",nerve:"神经",skin:"皮肤透明度",rel:"关联结构",soft:"皮肤/软组织",pick:"点击上方结构，查看走向。",S:[
+["骨骼","手部共 27 块骨：8 块腕骨、5 根掌骨、14 节指骨，并与桡骨、尺骨相连。掌骨沿手掌纵向走行，指骨逐节向指尖延伸。"],
+["指浅屈肌腱","肌腹在前臂掌侧，起自肱骨内上髁附近；肌腱向下穿过腕管和手掌，止于各指中节指骨两侧，屈近端指间关节。割伤、挤压时易受损。"],
+["指深屈肌腱","起自尺骨前面，肌腱穿过浅屈肌腱的分叉，止于远节指骨底的掌侧，屈远端指间关节。指尖损伤与肌腱撕脱常涉及。"],
+["指伸肌腱","肌腹在前臂背侧，起自肱骨外上髁；肌腱沿手背向指尖走行，形成指背腱膜，止于中节、远节指骨，负责伸直手指。"],
+["鱼际肌","位于拇指根部掌侧，起自屈肌支持带、舟骨和大多角骨，走向拇指近节指骨和第一掌骨，负责拇指对掌与外展。"],
+["正中神经","沿前臂掌侧中线下行，穿过腕管后分出指神经，支配拇指、示指、中指和环指桡侧半的感觉，以及鱼际肌。振动、压迫可致腕管综合征。"]]}},
+en:{title:"Hand Injury 3D Rehab System",sub:"Dual-center console · ZH / EN / KO",model:"3D hand model (drag to rotate)",curl:"Finger flexion",hint:"Pick an injury type; the affected area is highlighted on the model.",cam:"Camera",camOn:"Start camera",camOff:"Stop camera",ph:"Camera is off",link:"Drive the model with hand motion",motion:"Motion",console:"Dual-center console",
+A:"Kyungwoon University",Ar:"Rehabilitation Center · clinical & rehab assessment",B:"Enterprise Safety Center",Br:"Factory floor · prevention & corrective action",
+sync:"Sync both centers",disc:"Demo data for illustration only; not medical advice.",err:"Cannot open the camera. Check permissions or use an HTTPS page.",
+k:{inj:"Injury",plan:"Rehab plan",stage:"Stage",risk:"Risk level",act:"Site action",rep:"Reported"},
+lv:["Low","Medium","High"],
+inj:[["Fingertip crush","Pinch / crushing","Acute: edema control, protection; graded grip and fine-motor training","Two-hand start and light curtain on machines; anti-pinch guards"],
+["Laceration","Blades / stamping edges","After healing: scar massage, tendon-gliding exercises","Cut-resistant gloves, blade guards, safe feeding procedure"],
+["Burn / scald","Heat / chemicals","Early passive ROM, pressure garment, anti-contracture positioning","Heat-resistant gloves, hot-zone signage, eyewash/shower station"],
+["Metacarpal fracture","Heavy object impact","After fixation: active motion of free fingers, progressive loading","Lifting aids for heavy loads; safe-distance markings"],
+["Vibration / nerve injury","Long tool vibration","Nerve-gliding exercises; limit continuous work time","Low-vibration tools, job rotation, hourly breaks"]],
+st:["Acute","Subacute","Recovery"],X:{bone:"Bones",muscle:"Muscles/tendons",nerve:"Nerve",skin:"Skin opacity",rel:"Structures involved",soft:"Skin / soft tissue",pick:"Tap a structure above to see its course.",S:[
+["Bones","27 bones in the hand: 8 carpals, 5 metacarpals and 14 phalanges, joined to the radius and ulna. Metacarpals run lengthwise through the palm; phalanges extend segment by segment to the fingertip."],
+["Flexor digitorum superficialis","Belly in the volar forearm, arising near the medial epicondyle; the tendon passes through the carpal tunnel and palm and inserts on the sides of the middle phalanx, flexing the PIP joint. Vulnerable to lacerations and crush."],
+["Flexor digitorum profundus","Arises from the anterior ulna; its tendon passes through the split of the superficialis tendon and inserts on the palmar base of the distal phalanx, flexing the DIP joint. Often involved in fingertip injuries and avulsions."],
+["Extensor digitorum","Belly in the dorsal forearm, arising from the lateral epicondyle; tendons run along the back of the hand into the extensor expansion and insert on the middle and distal phalanges, extending the fingers."],
+["Thenar muscles","At the thumb base on the palm side, arising from the flexor retinaculum, scaphoid and trapezium and running to the thumb’s proximal phalanx and first metacarpal; they oppose and abduct the thumb."],
+["Median nerve","Runs down the middle of the volar forearm, passes through the carpal tunnel, then splits into digital nerves; supplies sensation to the thumb, index, middle and radial half of the ring finger, plus the thenar muscles. Vibration and compression can cause carpal tunnel syndrome."]]}},
+ko:{title:"손 산업재해 3D 재활 시스템",sub:"이중 센터 관제 콘솔 · 중 / 영 / 한",model:"3D 손 모델 (드래그하여 회전)",curl:"손가락 굴곡",hint:"재해 유형을 선택하면 해당 부위가 모델에 강조됩니다.",cam:"카메라",camOn:"카메라 켜기",camOff:"카메라 끄기",ph:"카메라가 꺼져 있습니다",link:"손 움직임으로 모델 제어",motion:"움직임",console:"이중 센터 관제 콘솔",
+A:"경운대학교",Ar:"재활훈련센터 · 임상 및 재활 평가",B:"기업 안전센터",Br:"작업 현장 · 사고 예방 및 시정 조치",
+sync:"두 센터 동기화",disc:"시연용 데이터이며 의료 조언이 아닙니다.",err:"카메라를 열 수 없습니다. 권한을 확인하거나 HTTPS 페이지를 사용하세요.",
+k:{inj:"손상",plan:"재활 계획",stage:"단계",risk:"위험 등급",act:"현장 조치",rep:"보고"},
+lv:["낮음","중간","높음"],
+inj:[["손끝 압궤상","끼임/눌림","급성기: 부종 관리·보호, 단계적 쥐기 및 정밀 동작 훈련","양손 기동·광센서 설치, 끼임 방지 덮개"],
+["열상","칼날/프레스 모서리","치유 후: 흉터 마사지, 힘줄 활주 운동","절단 방지 장갑, 칼날 덮개, 안전한 투입 절차"],
+["화상","고열/화학물질","초기 수동 관절운동, 압박복, 구축 방지 자세","내열 장갑, 고온 구역 표지, 세안·샤워 설비"],
+["중수골 골절","중량물 충격","고정 후: 자유 손가락 능동운동, 점진적 강화","중량물 운반 보조, 안전거리 표시"],
+["진동/신경 손상","공구 진동 장기 노출","신경 활주 운동, 연속 작업 시간 제한","저진동 공구, 작업 교대, 매시간 휴식"]],
+st:["급성기","아급성기","회복기"],X:{bone:"뼈",muscle:"근육/힘줄",nerve:"신경",skin:"피부 투명도",rel:"관련 구조",soft:"피부/연부조직",pick:"위의 구조를 눌러 주행 방향을 확인하세요.",S:[
+["뼈","손에는 수근골 8개, 중수골 5개, 지골 14개 등 27개의 뼈가 있으며 요골·척골과 연결됩니다. 중수골은 손바닥을 세로로 지나고 지골은 마디별로 손끝까지 이어집니다."],
+["얕은손가락굽힘근 힘줄","근복은 전완 손바닥쪽에 있고 상완골 내측상과 부근에서 시작합니다. 힘줄은 수근관과 손바닥을 지나 중간 지골 양옆에 닿아 근위지골간관절을 굽힙니다. 열상과 압궤에 취약합니다."],
+["깊은손가락굽힘근 힘줄","척골 앞면에서 시작하며 힘줄이 얕은손가락굽힘근 힘줄의 갈라진 틈을 통과해 말단 지골 바닥의 손바닥쪽에 닿고 원위지골간관절을 굽힙니다. 손끝 손상과 힘줄 열탈에 자주 관여합니다."],
+["손가락폄근 힘줄","근복은 전완 손등쪽에 있고 상완골 외측상과에서 시작합니다. 힘줄은 손등을 따라 손끝 방향으로 가며 손가락등 건막을 이루어 중간·말단 지골에 닿아 손가락을 폅니다."],
+["엄지두덩근","엄지 밑동 손바닥쪽에 있으며 굴근지지띠, 주상골, 대능형골에서 시작해 엄지 근위지골과 제1중수골로 향합니다. 엄지의 맞섬과 벌림을 담당합니다."],
+["정중신경","전완 손바닥쪽 중앙을 따라 내려가 수근관을 지난 뒤 지신경으로 갈라집니다. 엄지·검지·중지와 약지 요측 절반의 감각, 엄지두덩근을 지배합니다. 진동과 압박은 손목터널증후군을 일으킬 수 있습니다."]]}}
+};
+const rI=[0,2,-1,0,5],risks=[2,1,2,2,1],stg=[0,2,1,1,2],zones=['tip','palm','palm','mid','wrist'],rc=['#1a7f4b','#d97706','#d1242f'];
+let lang='zh',sel=0,ssel=-1,curl=0,tgtCurl=0;
+const $=id=>document.getElementById(id);
+function logAdd(s){const d=document.createElement('div');d.textContent=new Date().toLocaleTimeString()+'  '+s;$('log').prepend(d)}
+function render(){
+ const t=L[lang],i=t.inj[sel];document.documentElement.lang=lang;document.title=t.title;
+ $('t_title').textContent=t.title;$('t_sub').textContent=t.sub;$('t_model').textContent=t.model;$('t_curl').textContent=t.curl;$('t_hint').textContent=t.hint;
+ $('t_cam').textContent=t.cam;$('t_link').textContent=t.link;$('t_motion').textContent=t.motion;$('t_console').textContent=t.console;$('t_disc').textContent=t.disc;
+ $('camBtn').textContent=stream?t.camOff:t.camOn;$('ph').textContent=t.ph;$('ph').style.display=stream?'none':'grid';$('sync').textContent=t.sync;
+ $('a_name').textContent=t.A;$('a_role').textContent=t.Ar;$('b_name').textContent=t.B;$('b_role').textContent=t.Br;
+ const X=t.X;$('t_bone').textContent=X.bone;$('t_muscle').textContent=X.muscle;$('t_nerve').textContent=X.nerve;$('t_skin').textContent=X.skin;
+ $('schips').innerHTML=X.S.map((s,n)=>`<button data-s="${n}" class="${n==ssel?'on':''}">${s[0]}</button>`).join('');
+ $('sinfo').style.borderLeftColor=ssel<0?'var(--line)':'#'+SC[ssel].toString(16).padStart(6,'0');
+ $('sinfo').innerHTML=ssel<0?X.pick:`<b>${X.S[ssel][0]}</b><br>${X.S[ssel][1]}`;
+ const rk=`<span class="risk" style="background:${rc[risks[sel]]}">${t.lv[risks[sel]]}</span>`;
+ $('a_kv').innerHTML=`<b>${t.k.inj}</b><span>${i[0]}</span><b>${t.k.stage}</b><span>${t.st[stg[sel]]}</span><b>${X.rel}</b><span>${rI[sel]<0?X.soft:X.S[rI[sel]][0]}</span><b>${t.k.plan}</b><span>${i[2]}</span>`;
+ $('b_kv').innerHTML=`<b>${t.k.inj}</b><span>${i[0]} · ${i[1]}</span><b>${t.k.risk}</b><span>${rk}</span><b>${t.k.act}</b><span>${i[3]}</span>`;
+ $('chips').innerHTML=t.inj.map((x,n)=>`<button data-n="${n}" class="${n==sel?'on':''}">${x[0]}</button>`).join('');
+ document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.l==lang));
+}
+$('lang').onclick=e=>{if(e.target.dataset.l){lang=e.target.dataset.l;render()}};
+$('chips').onclick=e=>{const n=e.target.dataset.n;if(n!==undefined){sel=+n;render();logAdd(L[lang].A+' ⇄ '+L[lang].B+' : '+L[lang].inj[sel][0])}};
+$('sync').onclick=()=>logAdd(L[lang].A+' → '+L[lang].B+' | '+L[lang].inj[sel][0]+' | '+L[lang].lv[risks[sel]]);
+$('curl').oninput=e=>{tgtCurl=e.target.value/100};
+$('schips').onclick=e=>{const n=e.target.dataset.s;if(n!==undefined){ssel=ssel==+n?-1:+n;if(ssel>=0)$('ly_'+LY[ssel]).checked=true;render()}};
+
+/* 3D hand */
+const host=$('cv'),scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,1,.1,50);cam.position.set(0,-.6,10.8);cam.lookAt(0,-.6,0);
+const ren=new THREE.WebGLRenderer({antialias:true,alpha:true});ren.setPixelRatio(Math.min(devicePixelRatio,2));host.appendChild(ren.domElement);
+scene.add(new THREE.AmbientLight(0xffffff,.7));const dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(3,5,6);scene.add(dl);
+const root=new THREE.Group();scene.add(root);const tagged=[];const skin=0xe8b896;
+function mk(geo,zone){const m=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:skin,roughness:.7,emissive:0x000000,transparent:true,opacity:.35}));m.userData.zone=zone;tagged.push(m);return m}
+const palm=mk(new THREE.BoxGeometry(2.1,2,.7),'palm');palm.position.y=0;root.add(palm);
+const wrist=mk(new THREE.CylinderGeometry(.6,.78,3,24),'wrist');wrist.position.y=-2.5;root.add(wrist);
+const S={bone:[],fds:[],fdp:[],ext:[],thenar:[],nerve:[]},SK=['bone','fds','fdp','ext','thenar','nerve'],LY=['bone','muscle','muscle','muscle','muscle','nerve'],SC=[0xf1ead2,0xe05a47,0xa8323e,0xe08a3c,0xc94c4c,0xf5d020];
+function inner(st,geo,par){const m=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:SC[SK.indexOf(st)],roughness:.5,emissive:0}));m.userData.st=st;S[st].push(m);par.add(m);return m}
+function rod(st,a,b,r,par){const p=new THREE.Vector3(...a),q=new THREE.Vector3(...b),d=q.clone().sub(p),m=inner(st,new THREE.CylinderGeometry(r,r,d.length(),8),par);m.position.copy(p).add(q).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());return m}
+function anat(j,sl,k,fi){
+ rod('bone',[0,.04*sl,0],[0,.96*sl,0],.078-k*.008,j).userData.z=k==2?'tip':'mid';
+ rod('fdp',[.04,0,.14],[.04,sl,.14],.035,j);
+ if(k<2&&fi<4)rod('fds',[-.04,0,.14],[-.04,sl,.14],.035,j);
+ rod('ext',[0,0,-.14],[0,sl,-.14],.035,j)}
+function buildAnat(){
+ const xs=[-.78,-.26,.26,.78];
+ xs.forEach(x=>{rod('bone',[x*.8,-.85,0],[x,.95,0],.09,root).userData.z='mid'});
+ rod('bone',[.45,-.85,0],[1.1,-.5,0],.1,root).userData.z='mid';
+ for(let i=0;i<4;i++)for(let r=0;r<2;r++){const m=inner('bone',new THREE.SphereGeometry(.22,10,8),root);m.position.set(-.6+i*.4,-1.05-r*.4,0)}
+ rod('bone',[-.2,-1.5,0],[-.2,-4,0],.13,root);rod('bone',[.25,-1.5,0],[.25,-4,0],.14,root);
+ xs.forEach(x=>{rod('fdp',[x*.4+.04,-2.4,.14],[x+.04,1,.14],.035,root);rod('fds',[x*.4-.04,-2.4,.14],[x-.04,1,.14],.035,root);rod('ext',[x*.4,-2.4,-.14],[x,1,-.14],.035,root)});
+ [['fds',.3,.8,-.18],['fdp',.2,.6,.18],['ext',-.3,.9,0]].forEach(a=>{const m=inner(a[0],new THREE.SphereGeometry(1,16,12),root);m.scale.set(.42,a[2],.22);m.position.set(a[3],-2.9,a[1])});
+ const th=inner('thenar',new THREE.SphereGeometry(1,16,12),root);th.scale.set(.4,.7,.15);th.position.set(.7,-.5,.2);th.rotation.z=-.5;
+ rod('nerve',[0,-4,.24],[0,-.9,.24],.05,root);
+ xs.forEach(x=>rod('nerve',[0,-.9,.24],[x*.95,.95,.24],.028,root));
+ rod('nerve',[0,-.9,.24],[.95,-.45,.24],.03,root)}
+const fingers=[];
+function finger(x,y,len,rz,fi){const g=new THREE.Group();g.position.set(x,y,0);g.rotation.z=rz;root.add(g);const js=[];let parent=g;const sl=len/3;
+ for(let k=0;k<3;k++){const j=new THREE.Group();if(k>0)j.position.y=sl;parent.add(j);const seg=mk(new THREE.CylinderGeometry(.19-k*.02,.2-k*.02,sl,16),k==2?'tip':'mid');seg.position.y=sl/2;j.add(seg);
+  const kn=mk(new THREE.SphereGeometry(.2-k*.02,16,12),k==2?'tip':'mid');j.add(kn);anat(j,sl,k,fi);js.push(j);parent=j}
+ const t=mk(new THREE.SphereGeometry(.17,16,12),'tip');t.position.y=sl;js[2].add(t);fingers.push(js)}
+[[-.78,1,1.2],[-.26,1,1.4],[.26,1,1.3],[.78,1,1.0]].forEach((a,n)=>finger(a[0],a[1],a[2],0,n));
+finger(1.1,-.5,1.1,-1.0,4);
+buildAnat();
+let rx=-.2,ry=.5,drag=false,px=0,py=0,idle=0;
+host.addEventListener('pointerdown',e=>{drag=true;px=e.clientX;py=e.clientY;host.setPointerCapture(e.pointerId)});
+host.addEventListener('pointerup',()=>{drag=false});
+host.addEventListener('pointermove',e=>{if(!drag)return;ry+=(e.clientX-px)*.01;rx+=(e.clientY-py)*.01;rx=Math.max(-1.2,Math.min(1.2,rx));px=e.clientX;py=e.clientY;idle=0});
+function resize(){const w=host.clientWidth,h=host.clientHeight;ren.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix()}
+addEventListener('resize',resize);resize();
+let t0=0;
+(function loop(ts){requestAnimationFrame(loop);const p=ts/1000;
+ if(!drag){idle+=.016;if(idle>3)ry+=.004}
+ root.rotation.set(rx,ry,0);
+ curl+=(tgtCurl-curl)*.12;
+ fingers.forEach((js,n)=>js.forEach((j,k)=>{const a=n==4?(k==0?.2:.9)*curl:(k==0?1.1:k==1?1.3:.9)*curl;j.rotation.x=a}));
+ const pulse=.35+.3*Math.sin(p*5);
+ tagged.forEach(m=>{const on=m.userData.zone==zones[sel];m.material.emissive.setHex(on?0xff2020:0);m.material.emissiveIntensity=on?pulse:0});
+ const so=$('skin').value/100;tagged.forEach(m=>{m.material.opacity=so;m.material.depthWrite=so>.98});
+ SK.forEach((k,n)=>{const on=$('ly_'+LY[n]).checked,hl=ssel==n;S[k].forEach(m=>{m.visible=on;const ij=rI[sel]==n&&(k!='bone'||m.userData.z==zones[sel]);m.material.emissive.setHex(hl?SC[n]:ij?0xff2020:0);m.material.emissiveIntensity=(hl||ij)?pulse:0})});
+ ren.render(scene,cam)})(0);
+
+/* camera + motion */
+let stream=null,prev=null,mt=null;const vid=$('vid'),cv2=document.createElement('canvas');cv2.width=64;cv2.height=48;const cx=cv2.getContext('2d',{willReadFrequently:true});
+$('camBtn').onclick=async()=>{
+ if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;vid.srcObject=null;clearInterval(mt);prev=null;$('mbar').style.width='0';$('mval').textContent='0%';render();return}
+ try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});vid.srcObject=stream;await vid.play();render();
+  let sm=0;mt=setInterval(()=>{cx.drawImage(vid,0,0,64,48);const d=cx.getImageData(0,0,64,48).data;
+   if(prev){let s=0;for(let i=0;i<d.length;i+=4)s+=Math.abs(d[i]-prev[i])+Math.abs(d[i+1]-prev[i+1])+Math.abs(d[i+2]-prev[i+2]);const m=Math.min(1,s/(d.length/4)/60);sm+=(m-sm)*.4;
+    $('mbar').style.width=(sm*100)+'%';$('mval').textContent=Math.round(sm*100)+'%';if($('link').checked)tgtCurl=Math.min(1,sm*2.5);}
+   prev=new Uint8ClampedArray(d)},100)}
+ catch(e){stream=null;$('ph').style.display='grid';$('ph').textContent=L[lang].err}
+};
+render();logAdd(L[lang].A+' ⇄ '+L[lang].B);
+</script>
+</body>
+</html>
